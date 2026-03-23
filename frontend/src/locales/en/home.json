@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "title": "Nourish the Body, Awaken the Soul.",
+    "subtitle": "Discover wellness, health, and spirituality events near you. Join communities that resonate with your essence.",
+    "searchPlaceholder": "e.g. Ecstatic Dance, Yoga, Meditation..."
+  },
+  "popularEvents": {
+    "title": "Popular near you",
+    "tabs": {
+      "thisWeek": "This week",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "weekend": "This weekend",
+      "nextWeek": "Next week",
+      "all": "All"
+    }
+  },
+  "featuredGroups": {
+    "title": "Featured Groups",
+    "subtitle": "Active communities that share your path"
+  },
+  "exploreThemes": {
+    "title": "Explore Themes",
+    "subtitle": "Discover topics that resonate with you"
+  },
+  "community": {
+    "title": "From our Community"
+  },
+  "whyKarma": {
+    "title": "Why Karma?",
+    "feature1": {
+      "title": "Tickets for your event",
+      "description": "Manage free registrations and ticket sales in one place."
+    },
+    "feature2": {
+      "title": "Reach the right audience",
+      "description": "Connect with people who are looking for exactly what you offer."
+    },
+    "feature3": {
+      "title": "Contribute to Karma's mission",
+      "description": "Be part of a movement towards a more conscious and connected life."
+    },
+    "cta": {
+      "title": "Publish your first event in minutes!",
+      "subtitle": "It's free to start. Create your group and share your next event with the world."
+    }
+  },
+  "newsletter": {
+    "title": "Want to stay up to date?",
+    "subtitle": "Receive the best wellness and spirituality events in your inbox.",
+    "placeholder": "Your email address",
+    "consent": "I agree to receive the Karma newsletter. You can unsubscribe at any time."
+  }
+}

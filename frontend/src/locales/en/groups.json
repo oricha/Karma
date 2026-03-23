@@ -1,0 +1,30 @@
+{
+  "title": "Groups",
+  "join": "Join Group",
+  "leave": "Leave Group",
+  "joined": "Joined",
+  "tabs": {
+    "events": "Events",
+    "pastEvents": "Past events",
+    "discussion": "Discussion",
+    "members": "Members",
+    "photos": "Photos",
+    "about": "About"
+  },
+  "discussion": {
+    "writePost": "Write something for the group...",
+    "reply": "Reply",
+    "pinned": "Pinned",
+    "delete": "Delete"
+  },
+  "filters": {
+    "category": "Category",
+    "location": "Location",
+    "size": "Size",
+    "sort": "Sort by",
+    "mostActive": "Most active",
+    "newest": "Newest",
+    "mostMembers": "Most members",
+    "nearest": "Nearest"
+  }
+}

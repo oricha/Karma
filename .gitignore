@@ -1,16 +1,16 @@
-# Compiled class file
+.DS_Store
+.env
+.env.*
+
+# Java / Gradle / Maven
+.m2/
+backend/.gradle/
+backend/build/
+backend/target/
 *.class
-
-# Log file
 *.log
-
-# BlueJ files
 *.ctxt
-
-# Mobile Tools for Java (J2ME)
 .mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.nar
@@ -18,7 +18,22 @@
 *.zip
 *.tar.gz
 *.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+!backend/gradle/wrapper/gradle-wrapper.jar
 hs_err_pid*
 replay_pid*
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# Local databases / temp files
+backend/*.mv.db
+backend/*.trace.db
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+tmp/
+*.swp
+*.swo

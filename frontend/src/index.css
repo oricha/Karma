@@ -1,0 +1,159 @@
+@import '@fontsource/playfair-display/400.css';
+@import '@fontsource/playfair-display/500.css';
+@import '@fontsource/playfair-display/600.css';
+@import '@fontsource/playfair-display/700.css';
+@import '@fontsource/inter/300.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Karma Design System */
+    --background: 30 33% 97%;
+    --foreground: 0 0% 10%;
+
+    --card: 30 20% 95%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 30 33% 97%;
+    --popover-foreground: 0 0% 10%;
+
+    /* Terracotta primary */
+    --primary: 13 46% 53%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 13 48% 45%;
+    --primary-pressed: 13 52% 37%;
+    --primary-light: 13 60% 91%;
+    --primary-lightest: 13 60% 96%;
+
+    /* Blue secondary */
+    --secondary: 204 41% 39%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 204 43% 31%;
+    --secondary-pressed: 204 48% 23%;
+    --secondary-light: 204 50% 90%;
+    --secondary-lightest: 204 50% 95%;
+
+    --muted: 30 20% 93%;
+    --muted-foreground: 0 0% 29%;
+
+    --accent: 13 60% 91%;
+    --accent-foreground: 13 52% 37%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 18% 84%;
+    --input: 30 18% 84%;
+    --ring: 13 46% 53%;
+
+    --radius: 1rem;
+
+    /* Semantic colors */
+    --sage: 108 20% 59%;
+    --amber: 37 78% 56%;
+    --coral: 8 65% 65%;
+
+    /* Sidebar */
+    --sidebar-background: 30 33% 97%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 13 46% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 13 60% 96%;
+    --sidebar-accent-foreground: 13 52% 37%;
+    --sidebar-border: 30 18% 84%;
+    --sidebar-ring: 13 46% 53%;
+
+    /* Fonts */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 30 20% 93%;
+    --card: 0 0% 10%;
+    --card-foreground: 30 20% 93%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 30 20% 93%;
+    --primary: 13 46% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 204 41% 39%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 30 18% 70%;
+    --accent: 13 30% 20%;
+    --accent-foreground: 13 60% 91%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 13 46% 53%;
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 30 20% 93%;
+    --sidebar-primary: 13 46% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 13 30% 15%;
+    --sidebar-accent-foreground: 13 60% 91%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 13 46% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .blob-decoration {
+    @apply absolute rounded-full opacity-20 blur-3xl pointer-events-none;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-20 lg:py-24;
+  }
+
+  .pill-tag {
+    @apply inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium border transition-colors;
+  }
+
+  .pill-tag-active {
+    @apply bg-primary text-primary-foreground border-primary;
+  }
+
+  .pill-tag-inactive {
+    @apply bg-transparent text-foreground border-border hover:border-primary hover:text-primary;
+  }
+
+  .pill-tag-secondary-active {
+    @apply bg-secondary text-secondary-foreground border-secondary;
+  }
+
+  .gradient-hero {
+    background: linear-gradient(135deg, hsl(var(--primary-lightest)) 0%, hsl(var(--secondary-lightest)) 100%);
+  }
+
+  .gradient-section-warm {
+    background: hsl(var(--primary-lightest));
+  }
+
+  .gradient-section-cool {
+    background: hsl(var(--secondary-lightest));
+  }
+}

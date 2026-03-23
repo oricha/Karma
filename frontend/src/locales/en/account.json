@@ -1,0 +1,58 @@
+{
+  "sidebar": {
+    "myGroups": "My Groups",
+    "myEvents": "My Events",
+    "orders": "Orders",
+    "details": "Account details",
+    "preferences": "Preferences",
+    "savedEvents": "Saved events"
+  },
+  "details": {
+    "title": "Account details",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email address",
+    "phone": "Phone",
+    "bio": "Bio",
+    "photo": "Profile photo",
+    "language": "Preferred language",
+    "emailNotVerified": "Your email is not verified yet."
+  },
+  "preferences": {
+    "title": "Preferences",
+    "newsletter": "Newsletter frequency",
+    "weekly": "Weekly",
+    "biweekly": "Biweekly",
+    "monthly": "Monthly",
+    "karmaOnly": "Karma only",
+    "never": "Never",
+    "reviews": "Ask me to write reviews",
+    "themes": "What themes interest you?",
+    "location": "Where do you want to receive events?",
+    "radius": "Search radius"
+  },
+  "orders": {
+    "title": "Orders",
+    "purchaseDate": "Purchase date",
+    "event": "Event",
+    "tickets": "Tickets",
+    "empty": "You haven't purchased any tickets yet."
+  },
+  "savedEvents": {
+    "title": "Saved Events",
+    "empty": "You don't have any saved events. Explore events and click 'Save'."
+  },
+  "myEvents": {
+    "title": "My Events",
+    "upcoming": "Upcoming",
+    "past": "Past"
+  },
+  "myGroups": {
+    "title": "My Groups",
+    "browseMore": "Browse more groups",
+    "notifications": "Group notifications",
+    "immediate": "Immediate",
+    "digest": "Digest",
+    "never": "Never"
+  }
+}

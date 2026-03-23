@@ -1,0 +1,30 @@
+{
+  "title": "Grupos",
+  "join": "Unirse al Grupo",
+  "leave": "Dejar Grupo",
+  "joined": "Te has unido",
+  "tabs": {
+    "events": "Eventos",
+    "pastEvents": "Eventos pasados",
+    "discussion": "Discusión",
+    "members": "Miembros",
+    "photos": "Fotos",
+    "about": "Acerca de"
+  },
+  "discussion": {
+    "writePost": "Escribe algo para el grupo...",
+    "reply": "Responder",
+    "pinned": "Fijado",
+    "delete": "Eliminar"
+  },
+  "filters": {
+    "category": "Categoría",
+    "location": "Ubicación",
+    "size": "Tamaño",
+    "sort": "Ordenar por",
+    "mostActive": "Más activos",
+    "newest": "Más nuevos",
+    "mostMembers": "Más miembros",
+    "nearest": "Más cercanos"
+  }
+}
