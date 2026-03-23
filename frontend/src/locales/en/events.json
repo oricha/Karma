@@ -1,0 +1,51 @@
+{
+  "title": "Events",
+  "filters": {
+    "category": "Category",
+    "date": "Date",
+    "location": "Location",
+    "price": "Price",
+    "format": "Format",
+    "free": "Free",
+    "paid": "Paid",
+    "inPerson": "In Person",
+    "online": "Online",
+    "hybrid": "Hybrid",
+    "allCategories": "All categories",
+    "anyDate": "Any date",
+    "sortBy": "Sort by",
+    "relevance": "Relevance",
+    "date_asc": "Date (upcoming)",
+    "popularity": "Popularity",
+    "price_asc": "Price (lowest)"
+  },
+  "detail": {
+    "when": "When",
+    "where": "Where",
+    "organizer": "Organizer",
+    "about": "About this event",
+    "relatedEvents": "Related events",
+    "attendees": "Attendees",
+    "capacity": "Capacity",
+    "waitlist": "Waitlist",
+    "eventFull": "Event full — Join the waitlist",
+    "moreAttendees": "+{{count}} more",
+    "reviews": "Reviews"
+  },
+  "rsvp": {
+    "attending": "Attending",
+    "notAttending": "Not attending",
+    "waitlisted": "Waitlisted",
+    "maybe": "Maybe",
+    "joinWaitlist": "Join waitlist"
+  },
+  "categories": {
+    "workshops": "Workshops",
+    "ceremonies": "Ceremonies",
+    "dance": "Dance",
+    "music": "Music",
+    "festivals": "Festivals & Retreats",
+    "talks": "Talks & Performances",
+    "other": "Other"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "title": "Eventos",
+  "filters": {
+    "category": "Categoría",
+    "date": "Fecha",
+    "location": "Ubicación",
+    "price": "Precio",
+    "format": "Formato",
+    "free": "Gratis",
+    "paid": "De pago",
+    "inPerson": "Presencial",
+    "online": "Online",
+    "hybrid": "Híbrido",
+    "allCategories": "Todas las categorías",
+    "anyDate": "Cualquier fecha",
+    "sortBy": "Ordenar por",
+    "relevance": "Relevancia",
+    "date_asc": "Fecha (próximos)",
+    "popularity": "Popularidad",
+    "price_asc": "Precio (menor)"
+  },
+  "detail": {
+    "when": "Cuándo",
+    "where": "Dónde",
+    "organizer": "Organizador",
+    "about": "Acerca del evento",
+    "relatedEvents": "Eventos relacionados",
+    "attendees": "Asistentes",
+    "capacity": "Plazas",
+    "waitlist": "Lista de espera",
+    "eventFull": "Evento lleno — Unirse a la lista de espera",
+    "moreAttendees": "+{{count}} más",
+    "reviews": "Reseñas"
+  },
+  "rsvp": {
+    "attending": "Asistiré",
+    "notAttending": "No asistiré",
+    "waitlisted": "En lista de espera",
+    "maybe": "Tal vez",
+    "joinWaitlist": "Unirse a la lista de espera"
+  },
+  "categories": {
+    "workshops": "Talleres",
+    "ceremonies": "Ceremonias",
+    "dance": "Danza",
+    "music": "Música",
+    "festivals": "Festivales y Retiros",
+    "talks": "Charlas y Espectáculos",
+    "other": "Otros"
+  }
+}

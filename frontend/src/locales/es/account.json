@@ -1,0 +1,58 @@
+{
+  "sidebar": {
+    "myGroups": "Mis Grupos",
+    "myEvents": "Mis Eventos",
+    "orders": "Pedidos",
+    "details": "Datos de cuenta",
+    "preferences": "Preferencias",
+    "savedEvents": "Eventos guardados"
+  },
+  "details": {
+    "title": "Datos de cuenta",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "bio": "Bio",
+    "photo": "Foto de perfil",
+    "language": "Idioma preferido",
+    "emailNotVerified": "Tu email todavía no está verificado."
+  },
+  "preferences": {
+    "title": "Preferencias",
+    "newsletter": "Frecuencia de newsletter",
+    "weekly": "Semanal",
+    "biweekly": "Quincenal",
+    "monthly": "Mensual",
+    "karmaOnly": "Solo Karma",
+    "never": "Nunca",
+    "reviews": "Pedirme que escriba reseñas",
+    "themes": "¿Qué temáticas te interesan?",
+    "location": "¿En qué zona quieres recibir eventos?",
+    "radius": "Radio de búsqueda"
+  },
+  "orders": {
+    "title": "Pedidos",
+    "purchaseDate": "Fecha de compra",
+    "event": "Evento",
+    "tickets": "Entradas",
+    "empty": "Aún no has comprado ninguna entrada."
+  },
+  "savedEvents": {
+    "title": "Eventos Guardados",
+    "empty": "No tienes eventos guardados. Explora eventos y haz clic en 'Guardar'."
+  },
+  "myEvents": {
+    "title": "Mis Eventos",
+    "upcoming": "Próximos",
+    "past": "Pasados"
+  },
+  "myGroups": {
+    "title": "Mis Grupos",
+    "browseMore": "Explorar más grupos",
+    "notifications": "Notificaciones del grupo",
+    "immediate": "Inmediatas",
+    "digest": "Resumen",
+    "never": "Nunca"
+  }
+}

@@ -1,0 +1,27 @@
+.DS_Store
+.env
+.env.*
+
+# Java / Gradle / Maven
+.m2/
+backend/.gradle/
+backend/build/
+backend/target/
+*.class
+*.log
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# Local databases / temp files
+backend/*.mv.db
+backend/*.trace.db
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+tmp/
+*.swp
+*.swo

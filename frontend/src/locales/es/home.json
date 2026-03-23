@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "title": "Nutre el Cuerpo, Despierta el Alma.",
+    "subtitle": "Descubre eventos de bienestar, salud y espiritualidad cerca de ti. Únete a comunidades que vibran con tu esencia.",
+    "searchPlaceholder": "ej. Danza Extática, Yoga, Meditación..."
+  },
+  "popularEvents": {
+    "title": "Popular en tu zona",
+    "tabs": {
+      "thisWeek": "Esta semana",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "weekend": "Este fin de semana",
+      "nextWeek": "Próxima semana",
+      "all": "Todos"
+    }
+  },
+  "featuredGroups": {
+    "title": "Grupos Destacados",
+    "subtitle": "Comunidades activas que comparten tu camino"
+  },
+  "exploreThemes": {
+    "title": "Explora las Temáticas",
+    "subtitle": "Descubre los temas que resuenan contigo"
+  },
+  "community": {
+    "title": "De nuestra Comunidad"
+  },
+  "whyKarma": {
+    "title": "¿Por qué Karma?",
+    "feature1": {
+      "title": "Entradas para tu evento",
+      "description": "Gestiona inscripciones gratuitas y venta de entradas en un solo lugar."
+    },
+    "feature2": {
+      "title": "Llega a la audiencia correcta",
+      "description": "Conecta con personas que buscan exactamente lo que tú ofreces."
+    },
+    "feature3": {
+      "title": "Contribuye a la misión de Karma",
+      "description": "Forma parte de un movimiento hacia una vida más consciente y conectada."
+    },
+    "cta": {
+      "title": "¡Publica tu primer evento en minutos!",
+      "subtitle": "Es gratis empezar. Crea tu grupo y comparte tu próximo evento con el mundo."
+    }
+  },
+  "newsletter": {
+    "title": "¿Quieres estar al día?",
+    "subtitle": "Recibe los mejores eventos de bienestar y espiritualidad en tu bandeja de entrada.",
+    "placeholder": "Tu correo electrónico",
+    "consent": "Acepto recibir la newsletter de Karma. Puedes darte de baja en cualquier momento."
+  }
+}

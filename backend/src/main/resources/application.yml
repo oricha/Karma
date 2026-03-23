@@ -1,0 +1,26 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: karma-platform
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./build/karma-platform;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  mvc:
+    problemdetails:
+      enabled: true
+
+karma:
+  frontend-origin: http://localhost:8080
+  jwt:
+    issuer: karma-platform
+    access-token-minutes: 15
+    refresh-token-days: 7
+    secret: karma-platform-local-dev-secret-key-change-me-please
