@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/karma_production}
+    username: ${SPRING_DATASOURCE_USERNAME:karma}
+    password: ${SPRING_DATASOURCE_PASSWORD:change-me}
+    driver-class-name: org.postgresql.Driver

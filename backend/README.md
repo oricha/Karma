@@ -10,7 +10,8 @@ Spring Boot backend for the Karma platform.
 - Gradle
 - Flyway
 - In-memory seeded data store for local development
-- H2 for local Flyway migrations, PostgreSQL-ready driver included
+- PostgreSQL for local, test, and production runtime
+- H2 only for automated tests
 
 ## Commands
 
@@ -21,6 +22,20 @@ Spring Boot backend for the Karma platform.
 
 The API starts on `http://localhost:8081`.
 
+## Profiles
+
+- `local`: connects to PostgreSQL installed on the machine
+- `test`: containerized PostgreSQL for the Dokploy environment
+- `production`: containerized PostgreSQL for AWS deployment
+
+You can override credentials with environment variables:
+
+```bash
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/karma_local
+SPRING_DATASOURCE_USERNAME=postgres
+SPRING_DATASOURCE_PASSWORD=postgres
+```
+
 ## Database bootstrap
 
 Flyway now runs automatically on startup and creates seed tables plus sample events for July and August 2026 under:
@@ -28,13 +43,34 @@ Flyway now runs automatically on startup and creates seed tables plus sample eve
 - `src/main/resources/db/migration/V1__core_seed_schema.sql`
 - `src/main/resources/db/migration/V2__seed_july_august_events.sql`
 
-By default the backend uses a local H2 file database. You can override it with PostgreSQL environment variables:
+## Container deployment assets
+
+- `Dockerfile`: backend image build
+- `../deploy/test/docker-compose.yml`: Dokploy test stack
+- `../deploy/production/docker-compose.yml`: AWS production stack
+
+## Production workflow secrets
+
+The AWS workflow expects these GitHub secrets:
+
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_REGION`
+- `AWS_EC2_HOST`
+- `AWS_EC2_USER`
+- `AWS_EC2_SSH_KEY`
+- `AWS_ECR_REPOSITORY`
+- `PRODUCTION_DB_NAME`
+- `PRODUCTION_DB_USER`
+- `PRODUCTION_DB_PASSWORD`
+- `PRODUCTION_APP_PORT`
+- `PRODUCTION_FRONTEND_ORIGIN`
+- `PRODUCTION_JWT_SECRET`
+
+The Dokploy workflow expects:
 
 ```bash
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/karma
-SPRING_DATASOURCE_USERNAME=karma
-SPRING_DATASOURCE_PASSWORD=karma
-SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+DOKPLOY_DEPLOY_HOOK_URL=https://your-dokploy-instance.example.com/api/trpc/deployment.deploy?...
 ```
 
 ## Implemented API surface

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:karma-test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+karma:
+  frontend-origin: http://localhost:8080
+  jwt:
+    issuer: karma-platform
+    access-token-minutes: 15
+    refresh-token-days: 7
+    secret: karma-platform-local-dev-secret-key-change-me-please

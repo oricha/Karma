@@ -1,0 +1,40 @@
+name: karma-production
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: karma-postgres-production
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-karma_production}
+      POSTGRES_USER: ${DB_USER:-karma}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - karma_production_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-karma} -d ${DB_NAME:-karma_production}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: ${BACKEND_IMAGE}
+    container_name: karma-backend-production
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8081}:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-karma_production}
+      DB_USER: ${DB_USER:-karma}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KARMA_FRONTEND_ORIGIN: ${KARMA_FRONTEND_ORIGIN}
+      KARMA_JWT_SECRET: ${KARMA_JWT_SECRET}
+
+volumes:
+  karma_production_postgres_data:
