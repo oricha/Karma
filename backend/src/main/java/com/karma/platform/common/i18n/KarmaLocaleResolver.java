@@ -1,8 +1,7 @@
 package com.karma.platform.common.i18n;
 
 import com.karma.platform.config.KarmaI18nProperties;
-import com.karma.platform.model.User;
-import com.karma.platform.seed.PlatformDataStore;
+import com.karma.platform.persistence.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,11 +17,11 @@ public class KarmaLocaleResolver implements LocaleResolver {
 
     private static final String LANGUAGE_PARAMETER = "lang";
 
-    private final PlatformDataStore dataStore;
+    private final UserRepository userRepository;
     private final KarmaI18nProperties properties;
 
-    public KarmaLocaleResolver(PlatformDataStore dataStore, KarmaI18nProperties properties) {
-        this.dataStore = dataStore;
+    public KarmaLocaleResolver(UserRepository userRepository, KarmaI18nProperties properties) {
+        this.userRepository = userRepository;
         this.properties = properties;
     }
 
@@ -49,8 +48,8 @@ public class KarmaLocaleResolver implements LocaleResolver {
         if (principal == null) {
             return Optional.empty();
         }
-        return dataStore.findUserById(principal.toString())
-                .map(User::locale)
+        return userRepository.findById(principal.toString())
+                .map(user -> user.getLocale())
                 .flatMap(this::parseLocale);
     }
 

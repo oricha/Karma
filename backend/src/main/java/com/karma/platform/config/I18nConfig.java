@@ -2,7 +2,7 @@ package com.karma.platform.config;
 
 import com.karma.platform.common.i18n.KarmaLocaleResolver;
 import com.karma.platform.common.i18n.LocaleCookieInterceptor;
-import com.karma.platform.seed.PlatformDataStore;
+import com.karma.platform.persistence.repository.UserRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +24,8 @@ public class I18nConfig {
     }
 
     @Bean
-    LocaleResolver localeResolver(PlatformDataStore dataStore, KarmaI18nProperties properties) {
-        return new KarmaLocaleResolver(dataStore, properties);
+    LocaleResolver localeResolver(UserRepository userRepository, KarmaI18nProperties properties) {
+        return new KarmaLocaleResolver(userRepository, properties);
     }
 
     @Bean

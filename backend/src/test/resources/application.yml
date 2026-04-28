@@ -6,6 +6,15 @@ spring:
     driver-class-name: org.h2.Driver
   flyway:
     enabled: false
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-drop
+  sql:
+    init:
+      mode: always
+  jackson:
+    time-zone: UTC
 
 karma:
   frontend-origin: http://localhost:8080

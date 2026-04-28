@@ -45,7 +45,21 @@ public class SecurityConfig {
 
     @Bean
     PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        BCryptPasswordEncoder delegate = new BCryptPasswordEncoder();
+        return new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return delegate.encode(rawPassword);
+            }
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                if (encodedPassword != null && encodedPassword.startsWith("{noop}")) {
+                    return encodedPassword.substring("{noop}".length()).contentEquals(rawPassword);
+                }
+                return delegate.matches(rawPassword, encodedPassword);
+            }
+        };
     }
 
     @Bean

@@ -2,42 +2,50 @@ package com.karma.platform.service;
 
 import com.karma.platform.common.ApiException;
 import com.karma.platform.dto.EventDtos;
-import com.karma.platform.model.Event;
 import com.karma.platform.model.EventStatus;
-import com.karma.platform.model.Rsvp;
 import com.karma.platform.model.RsvpStatus;
-import com.karma.platform.seed.PlatformDataStore;
+import com.karma.platform.persistence.entity.EventEntity;
+import com.karma.platform.persistence.entity.RsvpEntity;
+import com.karma.platform.persistence.repository.CategoryRepository;
+import com.karma.platform.persistence.repository.EventRepository;
+import com.karma.platform.persistence.repository.RsvpRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class EventService {
 
-    private final PlatformDataStore dataStore;
+    private final EventRepository eventRepository;
+    private final CategoryRepository categoryRepository;
+    private final RsvpRepository rsvpRepository;
     private final ApiMapper apiMapper;
 
-    public EventService(PlatformDataStore dataStore, ApiMapper apiMapper) {
-        this.dataStore = dataStore;
+    public EventService(EventRepository eventRepository, CategoryRepository categoryRepository, RsvpRepository rsvpRepository, ApiMapper apiMapper) {
+        this.eventRepository = eventRepository;
+        this.categoryRepository = categoryRepository;
+        this.rsvpRepository = rsvpRepository;
         this.apiMapper = apiMapper;
     }
 
     public List<EventDtos.EventResponse> list(String categorySlug, String q) {
-        return dataStore.events().stream()
-                .filter(event -> event.status() == EventStatus.PUBLISHED)
-                .filter(event -> categorySlug == null || matchesCategory(event, categorySlug))
-                .filter(event -> q == null || event.title().toLowerCase().contains(q.toLowerCase()) || (event.description() != null && event.description().toLowerCase().contains(q.toLowerCase())))
-                .sorted(Comparator.comparing(Event::startDate))
+        String categoryId = categorySlug == null ? null : categoryRepository.findBySlug(categorySlug).map(item -> item.getId()).orElse(null);
+        return eventRepository.findByStatus(EventStatus.PUBLISHED).stream()
+                .filter(event -> categoryId == null || categoryId.equals(event.getCategoryId()))
+                .filter(event -> q == null || containsIgnoreCase(event.getTitle(), q) || containsIgnoreCase(event.getDescription(), q))
+                .sorted(Comparator.comparing(EventEntity::getStartDate))
                 .map(apiMapper::toEvent)
                 .toList();
     }
 
     public List<EventDtos.EventResponse> popular() {
-        return dataStore.events().stream()
-                .filter(event -> event.status() == EventStatus.PUBLISHED)
-                .sorted(Comparator.comparingInt((Event item) -> dataStore.attendeeCount(item.id())).reversed())
+        return eventRepository.findByStatus(EventStatus.PUBLISHED).stream()
+                .sorted(Comparator.comparingLong((EventEntity item) -> rsvpRepository.countByEventIdAndStatus(item.getId(), RsvpStatus.YES)).reversed())
                 .map(apiMapper::toEvent)
                 .toList();
     }
@@ -46,19 +54,18 @@ public class EventService {
         double queryLat = lat == null ? 40.4168 : lat;
         double queryLng = lng == null ? -3.7038 : lng;
         int radius = radiusKm == null ? 50 : radiusKm;
-        return dataStore.events().stream()
-                .filter(event -> event.status() == EventStatus.PUBLISHED)
-                .filter(event -> distanceKm(queryLat, queryLng, event.latitude(), event.longitude()) <= radius || event.isOnline())
-                .sorted(Comparator.comparingDouble(event -> distanceKm(queryLat, queryLng, event.latitude(), event.longitude())))
+        return eventRepository.findByStatus(EventStatus.PUBLISHED).stream()
+                .filter(event -> distanceKm(queryLat, queryLng, event.getLatitude(), event.getLongitude()) <= radius || event.isOnline())
+                .sorted(Comparator.comparingDouble(event -> distanceKm(queryLat, queryLng, event.getLatitude(), event.getLongitude())))
                 .map(apiMapper::toEvent)
                 .toList();
     }
 
     public EventDtos.EventDetailResponse detail(String slug) {
-        Event event = dataStore.eventBySlug(slug)
+        EventEntity event = eventRepository.findBySlug(slug)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.event-not-found", "Event not found"));
-        List<EventDtos.EventResponse> related = dataStore.events().stream()
-                .filter(item -> !item.id().equals(event.id()) && item.status() == EventStatus.PUBLISHED)
+        List<EventDtos.EventResponse> related = eventRepository.findByStatus(EventStatus.PUBLISHED).stream()
+                .filter(item -> !item.getId().equals(event.getId()))
                 .limit(3)
                 .map(apiMapper::toEvent)
                 .toList();
@@ -66,30 +73,47 @@ public class EventService {
     }
 
     public EventDtos.RsvpResponse rsvp(String eventId, String userId) {
-        return dataStore.userRsvp(eventId, userId).map(apiMapper::toRsvp).orElse(null);
+        return rsvpRepository.findByEventIdAndUserId(eventId, userId).map(apiMapper::toRsvp).orElse(null);
     }
 
+    @Transactional
     public EventDtos.RsvpResponse attend(String eventId, String userId) {
-        Event event = dataStore.eventById(eventId)
+        EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.event-not-found", "Event not found"));
-        int attendeeCount = dataStore.attendeeCount(eventId);
-        RsvpStatus status = event.maxAttendees() != null && attendeeCount >= event.maxAttendees() ? RsvpStatus.WAITLISTED : RsvpStatus.YES;
+        int attendeeCount = Math.toIntExact(rsvpRepository.countByEventIdAndStatus(eventId, RsvpStatus.YES));
+        RsvpStatus status = event.getMaxAttendees() != null && attendeeCount >= event.getMaxAttendees() ? RsvpStatus.WAITLISTED : RsvpStatus.YES;
         Integer waitlistPosition = status == RsvpStatus.WAITLISTED
-                ? (int) dataStore.rsvpsForEvent(eventId).stream().filter(item -> item.status() == RsvpStatus.WAITLISTED).count() + 1
+                ? (int) rsvpRepository.findByEventId(eventId).stream().filter(item -> item.getStatus() == RsvpStatus.WAITLISTED).count() + 1
                 : null;
-        Rsvp existing = dataStore.userRsvp(eventId, userId).orElse(null);
-        Rsvp updated = new Rsvp(existing == null ? dataStore.id() : existing.id(), eventId, userId, status, waitlistPosition, false, false);
-        dataStore.saveRsvp(updated);
-        return apiMapper.toRsvp(updated);
+
+        RsvpEntity rsvp = rsvpRepository.findByEventIdAndUserId(eventId, userId).orElseGet(() -> {
+            RsvpEntity created = new RsvpEntity();
+            created.setId(UUID.randomUUID().toString());
+            created.setCreatedAt(LocalDateTime.now());
+            return created;
+        });
+        rsvp.setEventId(eventId);
+        rsvp.setUserId(userId);
+        rsvp.setStatus(status);
+        rsvp.setWaitlistPosition(waitlistPosition);
+        rsvp.setCheckedIn(false);
+        rsvp.setNoShow(false);
+        rsvp.setUpdatedAt(LocalDateTime.now());
+        return apiMapper.toRsvp(rsvpRepository.save(rsvp));
     }
 
+    @Transactional
     public void cancelRsvp(String eventId, String userId) {
-        dataStore.userRsvp(eventId, userId).ifPresent(rsvp -> dataStore.saveRsvp(new Rsvp(rsvp.id(), eventId, userId, RsvpStatus.NO, null, false, false)));
+        rsvpRepository.findByEventIdAndUserId(eventId, userId).ifPresent(rsvp -> {
+            rsvp.setStatus(RsvpStatus.NO);
+            rsvp.setWaitlistPosition(null);
+            rsvp.setUpdatedAt(LocalDateTime.now());
+            rsvpRepository.save(rsvp);
+        });
     }
 
-    private boolean matchesCategory(Event event, String categorySlug) {
-        return dataStore.categories().stream()
-                .anyMatch(category -> category.id().equals(event.categoryId()) && category.slug().equals(categorySlug));
+    private boolean containsIgnoreCase(String value, String query) {
+        return value != null && value.toLowerCase().contains(query.toLowerCase());
     }
 
     private double distanceKm(double lat1, double lng1, double lat2, double lng2) {
