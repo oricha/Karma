@@ -12,7 +12,21 @@ public final class OrganizerDtos {
             int totalRsvps,
             int totalTicketsSold,
             double totalRevenue,
-            List<EventDtos.EventResponse> recentEvents
+            double averageRating,
+            int totalReviews,
+            List<EventDtos.EventResponse> recentEvents,
+            List<ActivityResponse> recentActivity
+    ) {
+    }
+
+    public record ActivityResponse(
+            String type,
+            String title,
+            String description,
+            String occurredAt,
+            String eventId,
+            String eventSlug,
+            String eventTitle
     ) {
     }
 }

@@ -6,6 +6,7 @@ import com.karma.platform.model.EventStatus;
 import com.karma.platform.model.RsvpStatus;
 import com.karma.platform.persistence.entity.EventEntity;
 import com.karma.platform.persistence.entity.RsvpEntity;
+import com.karma.platform.persistence.repository.ReviewRepository;
 import com.karma.platform.persistence.repository.CategoryRepository;
 import com.karma.platform.persistence.repository.EventRepository;
 import com.karma.platform.persistence.repository.RsvpRepository;
@@ -24,12 +25,14 @@ public class EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final RsvpRepository rsvpRepository;
+    private final ReviewRepository reviewRepository;
     private final ApiMapper apiMapper;
 
-    public EventService(EventRepository eventRepository, CategoryRepository categoryRepository, RsvpRepository rsvpRepository, ApiMapper apiMapper) {
+    public EventService(EventRepository eventRepository, CategoryRepository categoryRepository, RsvpRepository rsvpRepository, ReviewRepository reviewRepository, ApiMapper apiMapper) {
         this.eventRepository = eventRepository;
         this.categoryRepository = categoryRepository;
         this.rsvpRepository = rsvpRepository;
+        this.reviewRepository = reviewRepository;
         this.apiMapper = apiMapper;
     }
 
@@ -69,7 +72,10 @@ public class EventService {
                 .limit(3)
                 .map(apiMapper::toEvent)
                 .toList();
-        return new EventDtos.EventDetailResponse(apiMapper.toEvent(event), related);
+        List<EventDtos.ReviewResponse> reviews = reviewRepository.findByEventIdOrderByCreatedAtDesc(event.getId()).stream()
+                .map(apiMapper::toReview)
+                .toList();
+        return new EventDtos.EventDetailResponse(apiMapper.toEvent(event), related, reviews);
     }
 
     public EventDtos.RsvpResponse rsvp(String eventId, String userId) {

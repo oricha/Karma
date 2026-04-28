@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/lib/auth';
-import type { BlogPost, Category, Event, Group, Order, RSVP, User } from '@/types';
+import type { BlogPost, Category, Event, Group, Order, OrganizerDashboard, RSVP, Review, User } from '@/types';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '';
 
@@ -23,6 +23,12 @@ export interface AuthResponse {
 interface ActionResponse {
   message: string;
   token?: string | null;
+}
+
+export interface EventDetailResponse {
+  event: Event;
+  relatedEvents: Event[];
+  reviews: Review[];
 }
 
 async function request<T>(path: string, init: RequestInit = {}, allowRetry = true): Promise<T> {
@@ -102,13 +108,15 @@ export const api = {
     request<{ category: Category; themes: Array<{ id: string; categoryId: string; nameEs: string; nameEn: string; slug: string }> }>(`/api/categories/${slug}`),
   getEvents: (params?: URLSearchParams) => request<Event[]>(`/api/events${params ? `?${params.toString()}` : ''}`),
   getPopularEvents: () => request<Event[]>('/api/events/popular'),
-  getEvent: async (slug: string) => {
-    const response = await request<{ event: Event; relatedEvents: Event[] }>(`/api/events/${slug}`);
-    return response;
-  },
+  getEvent: (slug: string) => request<EventDetailResponse>(`/api/events/${slug}`),
   getEventRsvp: (id: string) => request<RSVP | null>(`/api/events/${id}/rsvp`),
   rsvpEvent: (id: string) => request<RSVP>(`/api/events/${id}/rsvp`, { method: 'POST' }),
   cancelRsvp: (id: string) => request<void>(`/api/events/${id}/rsvp`, { method: 'DELETE' }),
+  createReview: (eventId: string, payload: { rating: number; comment?: string }) =>
+    request<Review>(`/api/events/${eventId}/reviews`, { method: 'POST', body: JSON.stringify(payload) }),
+  updateReview: (eventId: string, payload: { rating: number; comment?: string }) =>
+    request<Review>(`/api/events/${eventId}/reviews`, { method: 'PUT', body: JSON.stringify(payload) }),
+  deleteReview: (eventId: string) => request<void>(`/api/events/${eventId}/reviews`, { method: 'DELETE' }),
   checkout: (eventId: string) =>
     request<{ checkoutUrl: string; order: Order }>('/api/orders/checkout', { method: 'POST', body: JSON.stringify({ eventId }) }),
 
@@ -122,6 +130,5 @@ export const api = {
 
   getBlogPosts: () => request<BlogPost[]>('/api/blog'),
   getFeaturedBlogPosts: () => request<BlogPost[]>('/api/blog/featured'),
-  getOrganizerDashboard: () =>
-    request<{ upcomingEvents: number; totalRsvps: number; totalTicketsSold: number; totalRevenue: number; recentEvents: Event[] }>('/api/organizers/me/dashboard'),
+  getOrganizerDashboard: () => request<OrganizerDashboard>('/api/organizers/me/dashboard'),
 };

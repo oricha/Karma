@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Email Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #007bff; }
+        .header h1 { color: #007bff; margin: 0; }
+        .cta-button { display: inline-block; padding: 12px 30px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .footer { text-align: center; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Verify Your Email</h1>
+    </div>
+    <div class="content">
+        <p>Hello <span th:text="${user.name}">User</span>,</p>
+        <p>To complete your registration, please verify your email address using the code or link below:</p>
+        <p>Verification Code: <strong th:text="${verificationCode}"></strong></p>
+        <p>Or click the link:</p>
+        <a th:href="${verificationLink}" class="cta-button">Verify Email</a>
+        <p>This link will expire in 24 hours.</p>
+    </div>
+    <div class="footer">
+        <p>&copy; 2026 Karma Platform</p>
+    </div>
+</div>
+</body>
+</html>

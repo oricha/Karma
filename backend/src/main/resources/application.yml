@@ -55,3 +55,12 @@ karma:
     timeout-millis: ${KARMA_GEOCODING_TIMEOUT_MILLIS:3000}
     max-retries: ${KARMA_GEOCODING_MAX_RETRIES:2}
     cache-size: ${KARMA_GEOCODING_CACHE_SIZE:500}
+  email:
+    enabled: ${KARMA_EMAIL_ENABLED:false}
+    from-email: ${KARMA_EMAIL_FROM:noreply@karma.local}
+    from-name: ${KARMA_EMAIL_FROM_NAME:Karma}
+  notification:
+    unsubscribe-base-url: ${KARMA_UNSUBSCRIBE_BASE_URL:https://karma.local}
+
+sendgrid:
+  api-key: ${SENDGRID_API_KEY:}

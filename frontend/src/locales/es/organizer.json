@@ -1,0 +1,23 @@
+{
+  "eyebrow": "Panel de organizador",
+  "title": "Visión operativa",
+  "subtitle": "Sigue la tracción de tus eventos, la respuesta de la comunidad y la actividad reciente en un único panel.",
+  "reviewsCount": "{{count}} reseñas totales",
+  "recentEventsTitle": "Eventos recientes",
+  "recentActivityTitle": "Actividad reciente",
+  "emptyEvents": "Todavía no hay eventos recientes para mostrar.",
+  "emptyActivity": "Todavía no hay actividad reciente.",
+  "metrics": {
+    "upcomingEvents": "Próximos eventos",
+    "totalRsvps": "RSVP confirmados",
+    "totalTicketsSold": "Entradas vendidas",
+    "totalRevenue": "Ingresos",
+    "averageRating": "Valoración media"
+  },
+  "activity": {
+    "types": {
+      "ORDER": "Pedido",
+      "REVIEW": "Reseña"
+    }
+  }
+}

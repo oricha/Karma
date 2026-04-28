@@ -18,6 +18,11 @@ spring:
 
 karma:
   frontend-origin: http://localhost:8080
+  i18n:
+    default-locale: es
+    locale-cookie-name: karma_locale
+  storage:
+    max-upload-size-bytes: 10485760
   jwt:
     issuer: karma-platform
     access-token-minutes: 15

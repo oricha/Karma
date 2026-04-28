@@ -11,7 +11,13 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, String> {
 
     List<ReviewEntity> findByEventId(String eventId);
 
+    List<ReviewEntity> findByEventIdOrderByCreatedAtDesc(String eventId);
+
+    List<ReviewEntity> findByEventIdIn(List<String> eventIds);
+
     Optional<ReviewEntity> findByUserIdAndEventId(String userId, String eventId);
+
+    long countByEventId(String eventId);
 
     @Query("select avg(r.rating) from ReviewEntity r where r.eventId = :eventId")
     Double averageRatingByEventId(String eventId);

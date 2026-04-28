@@ -1,5 +1,9 @@
 package com.karma.platform.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
+
 import java.util.List;
 
 public final class EventDtos {
@@ -43,7 +47,8 @@ public final class EventDtos {
 
     public record EventDetailResponse(
             EventResponse event,
-            List<EventResponse> relatedEvents
+            List<EventResponse> relatedEvents,
+            List<ReviewResponse> reviews
     ) {
     }
 
@@ -54,6 +59,32 @@ public final class EventDtos {
             String status,
             Integer waitlistPosition,
             boolean checkedIn
+    ) {
+    }
+
+    public record ReviewAuthorResponse(
+            String id,
+            String firstName,
+            String lastName,
+            String avatarUrl
+    ) {
+    }
+
+    public record ReviewResponse(
+            String id,
+            String eventId,
+            String userId,
+            ReviewAuthorResponse author,
+            int rating,
+            String comment,
+            String createdAt,
+            String updatedAt
+    ) {
+    }
+
+    public record UpsertReviewRequest(
+            @Min(1) @Max(5) int rating,
+            @Size(max = 2000) String comment
     ) {
     }
 }

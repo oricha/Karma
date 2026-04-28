@@ -11,5 +11,7 @@ public interface GroupRepository extends JpaRepository<GroupEntity, String> {
 
     Optional<GroupEntity> findBySlug(String slug);
 
+    List<GroupEntity> findByOrganizerId(String organizerId);
+
     List<GroupEntity> findByOrganizerIdAndStatus(String organizerId, GroupStatus status);
 }

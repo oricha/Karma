@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>Karma Platform News</title><style>body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; } .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; } .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #6f42c1; } .post-item { background: #f5f3ff; padding: 15px; margin: 15px 0; border-radius: 5px; border-left: 4px solid #6f42c1; } .post-title { font-weight: bold; font-size: 16px; color: #6f42c1; margin-bottom: 8px; } .post-excerpt { font-size: 14px; line-height: 1.5; } .unsubscribe { text-align: center; font-size: 12px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; } .footer { text-align: center; padding-top: 10px; font-size: 12px; color: #666; }</style></head>
+<body>
+<div class="container">
+    <div class="header"><h1>Karma Platform News</h1></div>
+    <div class="content">
+        <p>Hello <span th:text="${user.name}">User</span>,</p>
+        <p>Here are this week's featured articles:</p>
+
+        <div th:each="post : ${featuredPosts}">
+            <div class="post-item">
+                <div class="post-title" th:text="${post.title}">Article Title</div>
+                <p class="post-excerpt" th:text="${post.excerpt}">Article excerpt</p>
+                <a th:href="'#blog/' + ${post.slug}">Read more →</a>
+            </div>
+        </div>
+
+        <div class="unsubscribe">
+            <a th:href="'#unsubscribe=' + ${unsubscribeToken}">Unsubscribe</a>
+        </div>
+    </div>
+    <div class="footer"><p>&copy; 2026 Karma Platform</p></div>
+</div>
+</body>
+</html>

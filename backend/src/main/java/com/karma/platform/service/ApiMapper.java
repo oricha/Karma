@@ -18,6 +18,8 @@ public class ApiMapper {
     private final EventRepository eventRepository;
     private final EventThemeRepository eventThemeRepository;
     private final RsvpRepository rsvpRepository;
+    private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     public ApiMapper(
             CategoryRepository categoryRepository,
@@ -26,7 +28,9 @@ public class ApiMapper {
             GroupRepository groupRepository,
             EventRepository eventRepository,
             EventThemeRepository eventThemeRepository,
-            RsvpRepository rsvpRepository
+            RsvpRepository rsvpRepository,
+            ReviewRepository reviewRepository,
+            UserRepository userRepository
     ) {
         this.categoryRepository = categoryRepository;
         this.themeRepository = themeRepository;
@@ -35,6 +39,8 @@ public class ApiMapper {
         this.eventRepository = eventRepository;
         this.eventThemeRepository = eventThemeRepository;
         this.rsvpRepository = rsvpRepository;
+        this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
     }
 
     public UserDtos.UserResponse toUser(UserEntity user) {
@@ -131,6 +137,10 @@ public class ApiMapper {
     }
 
     public EventDtos.EventResponse toEvent(EventEntity event) {
+        return toEvent(event, reviewRepository.averageRatingByEventId(event.getId()), reviewRepository.countByEventId(event.getId()));
+    }
+
+    public EventDtos.EventResponse toEvent(EventEntity event, Double averageRating, long reviewCount) {
         OrganizerProfileEntity organizer = organizerProfileRepository.findById(event.getOrganizerId()).orElse(null);
         GroupEntity group = event.getGroupId() == null ? null : groupRepository.findById(event.getGroupId()).orElse(null);
         CategoryEntity category = categoryRepository.findById(event.getCategoryId()).orElse(null);
@@ -168,8 +178,25 @@ public class ApiMapper {
                 event.getLanguage(),
                 themeResponses,
                 category == null ? null : toCategory(category),
-                4.8,
-                12
+                averageRating == null ? null : Math.round(averageRating * 10.0) / 10.0,
+                Math.toIntExact(reviewCount)
+        );
+    }
+
+    public EventDtos.ReviewResponse toReview(ReviewEntity review) {
+        UserEntity user = userRepository.findById(review.getUserId()).orElse(null);
+        EventDtos.ReviewAuthorResponse author = user == null
+                ? null
+                : new EventDtos.ReviewAuthorResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getAvatarUrl());
+        return new EventDtos.ReviewResponse(
+                review.getId(),
+                review.getEventId(),
+                review.getUserId(),
+                author,
+                review.getRating(),
+                review.getComment(),
+                review.getCreatedAt() == null ? null : review.getCreatedAt().toString(),
+                review.getUpdatedAt() == null ? null : review.getUpdatedAt().toString()
         );
     }
 

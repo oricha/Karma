@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>¡Ya tienes lugar!</title><style>body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; } .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; } .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #ffc107; } .success-box { background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0; } .cta-button { display: inline-block; padding: 12px 30px; background-color: #ffc107; color: #333; text-decoration: none; border-radius: 5px; margin: 20px 0; } .footer { text-align: center; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }</style></head>
+<body>
+<div class="container">
+    <div class="header"><h1>¡Ya tienes lugar!</h1></div>
+    <div class="content">
+        <p>Hola <span th:text="${user.name}">Usuario</span>,</p>
+        <p>¡Buenas noticias! Alguien canceló su asistencia y ahora hay lugar para ti:</p>
+        <div class="success-box">
+            <h3 th:text="${event.title}">Evento</h3>
+            <p><strong>Fecha:</strong> <span th:text="${event.startTime}">Fecha</span></p>
+            <p><strong>Ubicación:</strong> <span th:text="${event.location}">Ubicación</span></p>
+        </div>
+        <p>Haz clic para confirmar tu asistencia:</p>
+        <a href="#" class="cta-button">Confirmar Asistencia</a>
+    </div>
+    <div class="footer"><p>&copy; 2026 Karma Platform</p></div>
+</div>
+</body>
+</html>

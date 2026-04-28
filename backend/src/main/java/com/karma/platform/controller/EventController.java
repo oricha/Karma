@@ -3,6 +3,7 @@ package com.karma.platform.controller;
 import com.karma.platform.common.CurrentUser;
 import com.karma.platform.dto.EventDtos;
 import com.karma.platform.service.EventService;
+import com.karma.platform.service.ReviewService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,10 +13,12 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final ReviewService reviewService;
     private final CurrentUser currentUser;
 
-    public EventController(EventService eventService, CurrentUser currentUser) {
+    public EventController(EventService eventService, ReviewService reviewService, CurrentUser currentUser) {
         this.eventService = eventService;
+        this.reviewService = reviewService;
         this.currentUser = currentUser;
     }
 
@@ -62,5 +65,25 @@ public class EventController {
     @GetMapping("/{id}/rsvp")
     public EventDtos.RsvpResponse rsvp(@PathVariable String id) {
         return eventService.rsvp(id, currentUser.id());
+    }
+
+    @GetMapping("/{id}/reviews")
+    public List<EventDtos.ReviewResponse> reviews(@PathVariable String id) {
+        return reviewService.list(id);
+    }
+
+    @PostMapping("/{id}/reviews")
+    public EventDtos.ReviewResponse createReview(@PathVariable String id, @RequestBody @jakarta.validation.Valid EventDtos.UpsertReviewRequest request) {
+        return reviewService.create(id, currentUser.id(), request);
+    }
+
+    @PutMapping("/{id}/reviews")
+    public EventDtos.ReviewResponse updateReview(@PathVariable String id, @RequestBody @jakarta.validation.Valid EventDtos.UpsertReviewRequest request) {
+        return reviewService.update(id, currentUser.id(), request);
+    }
+
+    @DeleteMapping("/{id}/reviews")
+    public void deleteReview(@PathVariable String id) {
+        reviewService.delete(id, currentUser.id());
     }
 }

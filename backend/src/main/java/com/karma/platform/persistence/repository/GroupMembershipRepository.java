@@ -12,5 +12,7 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
 
     List<GroupMembershipEntity> findByGroupId(String groupId);
 
+    List<GroupMembershipEntity> findByGroupIdAndStatus(String groupId, String status);
+
     Optional<GroupMembershipEntity> findByGroupIdAndUserId(String groupId, String userId);
 }

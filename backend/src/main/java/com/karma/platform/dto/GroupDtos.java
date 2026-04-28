@@ -45,4 +45,28 @@ public final class GroupDtos {
             List<UserDtos.UserResponse> members
     ) {
     }
+
+    public record UpsertGroupRequest(
+            String name,
+            String description,
+            String categoryId,
+            String bannerUrl,
+            String city,
+            String country,
+            boolean isPrivate
+    ) {
+    }
+
+    public record MembershipResponse(
+            String id,
+            String groupId,
+            String userId,
+            UserDtos.UserResponse user,
+            String role,
+            String status,
+            String notificationPreference,
+            String joinedAt,
+            String approvedAt
+    ) {
+    }
 }

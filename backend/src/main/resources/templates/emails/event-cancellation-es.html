@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>Evento Cancelado</title><style>body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; } .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; } .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #dc3545; } .alert-box { background: #f8d7da; padding: 15px; border-left: 4px solid #dc3545; margin: 20px 0; } .footer { text-align: center; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }</style></head>
+<body>
+<div class="container">
+    <div class="header"><h1>Evento Cancelado</h1></div>
+    <div class="content">
+        <p>Hola <span th:text="${user.name}">Usuario</span>,</p>
+        <p>Lamentamos informarte que el siguiente evento ha sido cancelado:</p>
+        <div class="alert-box">
+            <h3 th:text="${event.title}">Evento</h3>
+            <p><strong>Fecha:</strong> <span th:text="${event.startTime}">Fecha</span></p>
+            <p><strong>Ubicación:</strong> <span th:text="${event.location}">Ubicación</span></p>
+        </div>
+        <p>Si pagaste una entrada, recibirás un reembolso en los próximos 5-7 días hábiles.</p>
+        <p>Esperamos poder ofrecerte otro evento pronto.</p>
+    </div>
+    <div class="footer"><p>&copy; 2026 Karma Platform</p></div>
+</div>
+</body>
+</html>

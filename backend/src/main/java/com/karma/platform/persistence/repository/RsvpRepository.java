@@ -15,5 +15,7 @@ public interface RsvpRepository extends JpaRepository<RsvpEntity, String> {
 
     Optional<RsvpEntity> findByEventIdAndUserId(String eventId, String userId);
 
+    boolean existsByEventIdAndUserIdAndStatus(String eventId, String userId, RsvpStatus status);
+
     long countByEventIdAndStatus(String eventId, RsvpStatus status);
 }
