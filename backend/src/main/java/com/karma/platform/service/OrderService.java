@@ -23,12 +23,15 @@ public class OrderService {
     }
 
     public OrderDtos.CheckoutResponse checkout(String userId, String eventId) {
-        Event event = dataStore.eventById(eventId).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Event not found"));
+        Event event = dataStore.eventById(eventId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.event-not-found", "Event not found"));
         Order order = dataStore.saveOrder(new Order(dataStore.id(), userId, event.id(), OrderStatus.PAID, event.price() == null ? 0 : event.price(), event.currency() == null ? "EUR" : event.currency(), LocalDateTime.now()));
         return new OrderDtos.CheckoutResponse("https://checkout.stripe.test/session/" + order.id(), apiMapper.toOrder(order));
     }
 
     public OrderDtos.OrderResponse get(String id) {
-        return dataStore.orderById(id).map(apiMapper::toOrder).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Order not found"));
+        return dataStore.orderById(id)
+                .map(apiMapper::toOrder)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.order-not-found", "Order not found"));
     }
 }

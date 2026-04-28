@@ -125,6 +125,6 @@ public class UserService {
 
     private User requireUser(String userId) {
         return dataStore.findUserById(userId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.user-not-found", "User not found"));
     }
 }

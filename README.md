@@ -38,6 +38,8 @@ The frontend proxies `/api` requests to `http://localhost:8081`.
 - The backend currently uses seeded in-memory data so the frontend can be connected end-to-end while the platform is still being built out.
 - Flyway now provisions a local database schema plus sample July/August 2026 events for the eventual persistence layer.
 - Local development now targets a PostgreSQL instance installed on the machine through the `local` Spring profile.
+- PostgreSQL runtime is now standardized on PostgreSQL 16 + PostGIS for `local`, `test`, and `production`.
+- Backend phase 1 also introduces locale resolution, S3-compatible storage abstractions, and a provider-based geocoding layer.
 - `deploy/test/docker-compose.yml` provisions the test stack for Dokploy.
 - `deploy/production/docker-compose.yml` provisions the production stack for AWS EC2.
 - GitHub Actions workflows live in `.github/workflows/` for test Dokploy deployment and production AWS deployment.

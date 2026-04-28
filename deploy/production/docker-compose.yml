@@ -2,7 +2,7 @@ name: karma-production
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.4-alpine
     container_name: karma-postgres-production
     restart: unless-stopped
     environment:
@@ -11,6 +11,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - karma_production_postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-karma} -d ${DB_NAME:-karma_production}"]
       interval: 10s

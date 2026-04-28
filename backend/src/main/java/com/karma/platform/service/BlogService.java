@@ -25,6 +25,6 @@ public class BlogService {
 
     public BlogDtos.BlogPostResponse detail(String slug) {
         return dataStore.blogPostBySlug(slug).map(apiMapper::toBlogPost)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Blog post not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.blog-post-not-found", "Blog post not found"));
     }
 }

@@ -26,7 +26,7 @@ public class CategoryService {
 
     public CatalogDtos.CategoryDetailsResponse details(String slug) {
         Category category = dataStore.categoryBySlug(slug)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Category not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.category-not-found", "Category not found"));
         return new CatalogDtos.CategoryDetailsResponse(
                 apiMapper.toCategory(category),
                 dataStore.themesByCategory(category.id()).stream().map(apiMapper::toTheme).toList()

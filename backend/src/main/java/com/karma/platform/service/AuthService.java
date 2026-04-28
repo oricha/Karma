@@ -26,7 +26,7 @@ public class AuthService {
 
     public AuthDtos.AuthResponse register(AuthDtos.RegisterRequest request) {
         if (dataStore.findUserByEmail(request.email()).isPresent()) {
-            throw new ApiException(HttpStatus.CONFLICT, "Email is already registered");
+            throw new ApiException(HttpStatus.CONFLICT, "error.email-exists", "Email is already registered");
         }
         User user = dataStore.register(request.email(), request.password(), request.firstName(), request.lastName());
         return tokensFor(user, dataStore.createEmailVerificationToken(user.id()));
@@ -35,15 +35,15 @@ public class AuthService {
     public AuthDtos.AuthResponse login(AuthDtos.LoginRequest request) {
         User user = dataStore.findUserByEmail(request.email())
                 .filter(item -> passwordEncoder.matches(request.password(), item.passwordHash()))
-                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "error.bad-credentials", "Invalid email or password"));
         return tokensFor(user, null);
     }
 
     public AuthDtos.AuthResponse refresh(AuthDtos.RefreshRequest request) {
         String userId = dataStore.consumeRefreshTokenOwner(request.refreshToken())
-                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Refresh token is invalid"));
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "error.refresh-token-invalid", "Refresh token is invalid"));
         User user = dataStore.findUserById(userId)
-                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "error.user-not-found", "User not found"));
         jwtService.parse(request.refreshToken());
         return tokensFor(user, null);
     }
@@ -56,9 +56,9 @@ public class AuthService {
 
     public AuthDtos.ActionResponse resetPassword(AuthDtos.ResetPasswordRequest request) {
         String userId = dataStore.consumePasswordResetToken(request.token())
-                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Reset token is invalid or expired"));
+                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "error.reset-token-invalid", "Reset token is invalid or expired"));
         User user = dataStore.findUserById(userId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.user-not-found", "User not found"));
         dataStore.saveUser(new User(
                 user.id(),
                 user.email(),
@@ -77,9 +77,9 @@ public class AuthService {
 
     public AuthDtos.VerificationResponse verifyEmail(String token) {
         String userId = dataStore.consumeEmailVerificationToken(token)
-                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Verification token is invalid or expired"));
+                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "error.verification-token-invalid", "Verification token is invalid or expired"));
         User user = dataStore.findUserById(userId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.user-not-found", "User not found"));
         User verified = new User(
                 user.id(),
                 user.email(),

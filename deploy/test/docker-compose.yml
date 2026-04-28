@@ -2,7 +2,7 @@ name: karma-test
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.4-alpine
     container_name: karma-postgres-test
     restart: unless-stopped
     environment:
@@ -13,6 +13,7 @@ services:
       - "${DB_EXTERNAL_PORT:-5433}:5432"
     volumes:
       - karma_test_postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-karma} -d ${DB_NAME:-karma_test}"]
       interval: 10s

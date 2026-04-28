@@ -2,17 +2,6 @@
 
 Spring Boot backend for the Karma platform.
 
-## Stack
-
-- Java 21
-- Spring Boot 3
-- Spring Security with JWT
-- Gradle
-- Flyway
-- In-memory seeded data store for local development
-- PostgreSQL for local, test, and production runtime
-- H2 only for automated tests
-
 ## Commands
 
 ```bash
@@ -28,6 +17,8 @@ The API starts on `http://localhost:8081`.
 - `test`: containerized PostgreSQL for the Dokploy environment
 - `production`: containerized PostgreSQL for AWS deployment
 
+All runtime profiles now target PostgreSQL 16 with PostGIS enabled. Automated backend tests still use H2 and skip Flyway so PostGIS-specific migrations do not break CI.
+
 You can override credentials with environment variables:
 
 ```bash
@@ -36,12 +27,49 @@ SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
 ```
 
+## Phase 1 infrastructure variables
+
+Internationalization:
+
+- `KARMA_DEFAULT_LOCALE`
+- `KARMA_LOCALE_COOKIE_NAME`
+
+S3-compatible storage:
+
+- `KARMA_STORAGE_ENABLED`
+- `KARMA_STORAGE_BUCKET`
+- `KARMA_STORAGE_REGION`
+- `KARMA_STORAGE_ENDPOINT`
+- `KARMA_STORAGE_ACCESS_KEY`
+- `KARMA_STORAGE_SECRET_KEY`
+- `KARMA_STORAGE_PUBLIC_BASE_URL`
+- `KARMA_STORAGE_MAX_UPLOAD_SIZE_BYTES`
+
+Geocoding:
+
+- `KARMA_GEOCODING_ENABLED`
+- `KARMA_GEOCODING_PROVIDER`
+- `KARMA_GEOCODING_BASE_URL`
+- `KARMA_GEOCODING_USER_AGENT`
+- `KARMA_GEOCODING_TIMEOUT_MILLIS`
+- `KARMA_GEOCODING_MAX_RETRIES`
+- `KARMA_GEOCODING_CACHE_SIZE`
+
 ## Database bootstrap
 
 Flyway now runs automatically on startup and creates seed tables plus sample events for July and August 2026 under:
 
 - `src/main/resources/db/migration/V1__core_seed_schema.sql`
 - `src/main/resources/db/migration/V2__seed_july_august_events.sql`
+- `src/main/resources/db/migration/V3__enable_postgis_and_geo_indexes.sql`
+
+For local PostgreSQL installations you must also have the `postgis` extension available:
+
+```sql
+CREATE DATABASE karma;
+\c karma
+CREATE EXTENSION IF NOT EXISTS postgis;
+```
 
 ## Container deployment assets
 

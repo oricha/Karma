@@ -55,7 +55,8 @@ public class EventService {
     }
 
     public EventDtos.EventDetailResponse detail(String slug) {
-        Event event = dataStore.eventBySlug(slug).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Event not found"));
+        Event event = dataStore.eventBySlug(slug)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.event-not-found", "Event not found"));
         List<EventDtos.EventResponse> related = dataStore.events().stream()
                 .filter(item -> !item.id().equals(event.id()) && item.status() == EventStatus.PUBLISHED)
                 .limit(3)
@@ -69,7 +70,8 @@ public class EventService {
     }
 
     public EventDtos.RsvpResponse attend(String eventId, String userId) {
-        Event event = dataStore.eventById(eventId).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Event not found"));
+        Event event = dataStore.eventById(eventId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.event-not-found", "Event not found"));
         int attendeeCount = dataStore.attendeeCount(eventId);
         RsvpStatus status = event.maxAttendees() != null && attendeeCount >= event.maxAttendees() ? RsvpStatus.WAITLISTED : RsvpStatus.YES;
         Integer waitlistPosition = status == RsvpStatus.WAITLISTED

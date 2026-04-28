@@ -35,7 +35,8 @@ public class GroupService {
     }
 
     public GroupDtos.GroupDetailResponse detail(String slug) {
-        Group group = dataStore.groupBySlug(slug).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Group not found"));
+        Group group = dataStore.groupBySlug(slug)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.group-not-found", "Group not found"));
         return new GroupDtos.GroupDetailResponse(
                 apiMapper.toGroup(group),
                 dataStore.eventsByGroup(group.id()).stream().map(apiMapper::toEvent).toList(),
@@ -57,7 +58,7 @@ public class GroupService {
 
     public void updateNotification(String groupId, String userId, GroupNotificationPreference preference) {
         GroupMembership current = dataStore.membership(groupId, userId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Membership not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.membership-not-found", "Membership not found"));
         dataStore.saveMembership(new GroupMembership(current.id(), current.groupId(), current.userId(), current.role(), current.status(), preference));
     }
 }
