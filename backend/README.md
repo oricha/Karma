@@ -6,6 +6,7 @@ Spring Boot backend for the Karma platform.
 
 ```bash
 ./gradlew test
+./gradlew jacocoTestReport
 ./gradlew bootRun
 ```
 
@@ -25,6 +26,29 @@ You can override credentials with environment variables:
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/karma_local
 SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
+KARMA_JWT_SECRET=replace-with-a-long-random-secret
+```
+
+## Security and observability
+
+- OpenAPI JSON: `GET /v3/api-docs`
+- Swagger UI: `GET /swagger-ui.html`
+- Health endpoint: `GET /actuator/health`
+- JaCoCo HTML coverage report: `build/reports/jacoco/test/html/index.html`
+
+Phase 6 hardening now adds:
+
+- strict security headers (`CSP`, `HSTS`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`)
+- JWT audience validation in addition to issuer/signature/expiry checks
+- restricted CORS based on `KARMA_FRONTEND_ORIGIN`
+- HTTPS enforcement toggle via `KARMA_SECURITY_REQUIRE_HTTPS`
+- removal of unsafe production/test defaults for datasource credentials and JWT secret
+
+To enable the repository pre-commit secret scan hook:
+
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit
 ```
 
 ## Phase 1 infrastructure variables
@@ -94,6 +118,7 @@ The AWS workflow expects these GitHub secrets:
 - `PRODUCTION_APP_PORT`
 - `PRODUCTION_FRONTEND_ORIGIN`
 - `PRODUCTION_JWT_SECRET`
+- `KARMA_SECURITY_REQUIRE_HTTPS`
 
 The Dokploy workflow expects:
 

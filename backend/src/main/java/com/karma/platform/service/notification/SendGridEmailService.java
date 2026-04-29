@@ -1,263 +1,199 @@
 package com.karma.platform.service.notification;
 
-import com.karma.platform.entity.User;
-import com.karma.platform.entity.Event;
-import com.karma.platform.entity.Order;
+import com.karma.platform.config.NotificationEmailProperties;
+import com.karma.platform.config.NotificationProperties;
+import com.karma.platform.model.ReminderType;
+import com.karma.platform.persistence.entity.BlogPostEntity;
+import com.karma.platform.persistence.entity.EventEntity;
+import com.karma.platform.persistence.entity.OrderEntity;
+import com.karma.platform.persistence.entity.UserEntity;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
 import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.Email;
-import com.sendgrid.helpers.mail.Content;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
-@Service
-@RequiredArgsConstructor
-@Slf4j
 public class SendGridEmailService implements EmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(SendGridEmailService.class);
 
     private final SendGrid sendGrid;
     private final TemplateEngine templateEngine;
     private final MessageSource messageSource;
+    private final NotificationEmailProperties emailProperties;
+    private final NotificationProperties notificationProperties;
+    private final Map<String, Integer> sentPerHour = new ConcurrentHashMap<>();
 
-    @Value("${sendgrid.from-email:noreply@karma.local}")
-    private String fromEmail;
+    public SendGridEmailService(
+            SendGrid sendGrid,
+            TemplateEngine templateEngine,
+            MessageSource messageSource,
+            NotificationEmailProperties emailProperties,
+            NotificationProperties notificationProperties
+    ) {
+        this.sendGrid = sendGrid;
+        this.templateEngine = templateEngine;
+        this.messageSource = messageSource;
+        this.emailProperties = emailProperties;
+        this.notificationProperties = notificationProperties;
+    }
 
-    @Value("${sendgrid.from-name:Karma}")
-    private String fromName;
+    @Override
+    public void sendWelcomeEmail(UserEntity user) {
+        send(user, subject("email.welcome.subject", user), EmailTemplate.WELCOME, Map.of("user", user));
+    }
 
-    @Value("${app.unsubscribe-base-url:https://karma.local}")
-    private String unsubscribeBaseUrl;
+    @Override
+    public void sendEmailVerificationEmail(UserEntity user, String verificationToken) {
+        send(user, subject("email.verification.subject", user), EmailTemplate.EMAIL_VERIFICATION, Map.of(
+                "user", user,
+                "verificationToken", verificationToken,
+                "verificationLink", notificationProperties.getUnsubscribeBaseUrl() + "/verify-email?token=" + verificationToken
+        ));
+    }
 
-    private static final int RATE_LIMIT_PER_HOUR = 500;
-    private final Map<String, HourlyEmailCount> emailCounts = new ConcurrentHashMap<>();
+    @Override
+    public void sendPasswordResetEmail(UserEntity user, String resetToken) {
+        send(user, subject("email.password-reset.subject", user), EmailTemplate.PASSWORD_RESET, Map.of(
+                "user", user,
+                "resetToken", resetToken,
+                "resetLink", notificationProperties.getUnsubscribeBaseUrl() + "/reset-password?token=" + resetToken
+        ));
+    }
 
-    private static class HourlyEmailCount {
-        LocalDateTime hourStart;
-        AtomicInteger count = new AtomicInteger(0);
+    @Override
+    public void sendRsvpConfirmationEmail(UserEntity user, EventEntity event) {
+        send(user, subject("email.rsvp-confirmation.subject", user), EmailTemplate.RSVP_CONFIRMATION, Map.of("user", user, "event", event));
+    }
 
-        HourlyEmailCount(LocalDateTime hourStart) {
-            this.hourStart = hourStart;
+    @Override
+    public void sendWaitlistPromotionEmail(UserEntity user, EventEntity event) {
+        send(user, subject("email.waitlist-promotion.subject", user), EmailTemplate.WAITLIST_PROMOTION, Map.of("user", user, "event", event));
+    }
+
+    @Override
+    public void sendOrderConfirmationEmail(UserEntity user, OrderEntity order, EventEntity event) {
+        send(user, subject("email.order-confirmation.subject", user), EmailTemplate.ORDER_CONFIRMATION, Map.of("user", user, "order", order, "event", event));
+    }
+
+    @Override
+    public void sendEventCancellationEmail(UserEntity user, EventEntity event) {
+        send(user, subject("email.event-cancellation.subject", user), EmailTemplate.EVENT_CANCELLATION, Map.of("user", user, "event", event));
+    }
+
+    @Override
+    public void sendReviewRequestEmail(UserEntity user, EventEntity event) {
+        send(user, subject("email.review-request.subject", user), EmailTemplate.REVIEW_REQUEST, Map.of("user", user, "event", event));
+    }
+
+    @Override
+    public void sendNewEventNotificationEmail(UserEntity user, EventEntity event, String groupName) {
+        send(user, subject("email.new-group-event.subject", user), EmailTemplate.NEW_GROUP_EVENT, Map.of("user", user, "event", event, "groupName", groupName));
+    }
+
+    @Override
+    public void sendWeeklyDigestEmail(UserEntity user, DigestContent digestContent) {
+        send(user, subject("email.weekly-digest.subject", user), EmailTemplate.WEEKLY_DIGEST, Map.of(
+                "user", user,
+                "digest", digestContent,
+                "unsubscribeToken", digestContent.unsubscribeToken()
+        ));
+    }
+
+    @Override
+    public void sendPlatformNewsEmail(UserEntity user, List<BlogPostEntity> featuredPosts) {
+        send(user, subject("email.platform-news.subject", user), EmailTemplate.PLATFORM_NEWS, Map.of(
+                "user", user,
+                "featuredPosts", featuredPosts,
+                "unsubscribeToken", user.getId()
+        ));
+    }
+
+    @Override
+    public void sendEventReminderEmail(UserEntity user, EventEntity event, ReminderType reminderType) {
+        EmailTemplate template = switch (reminderType) {
+            case SEVEN_DAYS -> EmailTemplate.EVENT_REMINDER_7DAY;
+            case ONE_DAY -> EmailTemplate.EVENT_REMINDER_1DAY;
+            case TWO_HOURS -> EmailTemplate.EVENT_REMINDER_2HOUR;
+        };
+        String key = switch (reminderType) {
+            case SEVEN_DAYS -> "email.event-reminder-7day.subject";
+            case ONE_DAY -> "email.event-reminder-1day.subject";
+            case TWO_HOURS -> "email.event-reminder-2hour.subject";
+        };
+        send(user, subject(key, user), template, Map.of("user", user, "event", event, "reminderType", reminderType));
+    }
+
+    private void send(UserEntity user, String subject, EmailTemplate template, Map<String, Object> variables) {
+        EmailRetryTemplate.executeWithRetry(() -> {
+            checkRateLimit();
+            String body = render(template, locale(user), variables);
+            sendMail(subject, user.getEmail(), body);
+            recordSend();
+            return null;
+        }, "send_email:" + template.name());
+    }
+
+    private void sendMail(String subject, String recipientEmail, String body) {
+        Mail mail = new Mail(
+                new Email(emailProperties.getFromEmail(), emailProperties.getFromName()),
+                subject,
+                new Email(recipientEmail),
+                new Content("text/html", body)
+        );
+        Request request = new Request();
+        request.setMethod(Method.POST);
+        request.setEndpoint("mail/send");
+        try {
+            request.setBody(mail.build());
+            Response response = sendGrid.api(request);
+            if (response.getStatusCode() >= 400) {
+                throw new IllegalStateException("SendGrid rejected request with status " + response.getStatusCode());
+            }
+        } catch (IOException exception) {
+            throw new IllegalStateException("SendGrid request failed", exception);
         }
     }
 
-    @Override
-    @Async
-    public void sendWelcomeEmail(User user) {
-        String subject = messageSource.getMessage("email.welcome.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        sendEmail(user.getEmail(), subject, EmailTemplate.WELCOME, variables, user.getLocale());
+    private String subject(String key, UserEntity user) {
+        return messageSource.getMessage(key, null, key, locale(user));
     }
 
-    @Override
-    @Async
-    public void sendEmailVerificationEmail(User user, String verificationCode) {
-        String subject = messageSource.getMessage("email.verification.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("verificationCode", verificationCode);
-        variables.put("verificationLink", buildVerificationLink(user.getId(), verificationCode));
-        sendEmail(user.getEmail(), subject, EmailTemplate.EMAIL_VERIFICATION, variables, user.getLocale());
+    private Locale locale(UserEntity user) {
+        return "en".equalsIgnoreCase(user.getLocale()) ? Locale.ENGLISH : new Locale("es");
     }
 
-    @Override
-    @Async
-    public void sendPasswordResetEmail(User user, String resetToken) {
-        String subject = messageSource.getMessage("email.password-reset.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("resetToken", resetToken);
-        variables.put("resetLink", buildPasswordResetLink(user.getId(), resetToken));
-        sendEmail(user.getEmail(), subject, EmailTemplate.PASSWORD_RESET, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendRsvpConfirmationEmail(User user, Event event) {
-        String subject = messageSource.getMessage("email.rsvp-confirmation.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("event", event);
-        sendEmail(user.getEmail(), subject, EmailTemplate.RSVP_CONFIRMATION, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendWaitlistPromotionEmail(User user, Event event) {
-        String subject = messageSource.getMessage("email.waitlist-promotion.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("event", event);
-        sendEmail(user.getEmail(), subject, EmailTemplate.WAITLIST_PROMOTION, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendOrderConfirmationEmail(User user, Order order) {
-        String subject = messageSource.getMessage("email.order-confirmation.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("order", order);
-        sendEmail(user.getEmail(), subject, EmailTemplate.ORDER_CONFIRMATION, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendEventCancellationEmail(User user, Event event) {
-        String subject = messageSource.getMessage("email.event-cancellation.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("event", event);
-        sendEmail(user.getEmail(), subject, EmailTemplate.EVENT_CANCELLATION, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendReviewRequestEmail(User user, Event event) {
-        String subject = messageSource.getMessage("email.review-request.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("event", event);
-        sendEmail(user.getEmail(), subject, EmailTemplate.REVIEW_REQUEST, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendNewEventNotificationEmail(User user, Event event, String groupName) {
-        String subject = messageSource.getMessage("email.new-group-event.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("event", event);
-        variables.put("groupName", groupName);
-        sendEmail(user.getEmail(), subject, EmailTemplate.NEW_GROUP_EVENT, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendWeeklyDigestEmail(User user, DigestContent digest) {
-        String subject = messageSource.getMessage("email.weekly-digest.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("digest", digest);
-        variables.put("unsubscribeToken", generateUnsubscribeToken(user.getId()));
-        sendEmail(user.getEmail(), subject, EmailTemplate.WEEKLY_DIGEST, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendEventReminderEmail(User user, Event event, ReminderType reminderType) {
-        String templateKey = switch (reminderType) {
-            case SEVEN_DAY -> "email.event-reminder-7day.subject";
-            case ONE_DAY -> "email.event-reminder-1day.subject";
-            case TWO_HOUR -> "email.event-reminder-2hour.subject";
-        };
-        String subject = messageSource.getMessage(templateKey, null, getLocale(user));
-        EmailTemplate template = switch (reminderType) {
-            case SEVEN_DAY -> EmailTemplate.EVENT_REMINDER_7DAY;
-            case ONE_DAY -> EmailTemplate.EVENT_REMINDER_1DAY;
-            case TWO_HOUR -> EmailTemplate.EVENT_REMINDER_2HOUR;
-        };
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("event", event);
-        variables.put("reminderType", reminderType);
-        sendEmail(user.getEmail(), subject, template, variables, user.getLocale());
-    }
-
-    @Override
-    @Async
-    public void sendPlatformNewsEmail(User user, List<BlogPostSummary> featuredPosts) {
-        String subject = messageSource.getMessage("email.platform-news.subject", null, getLocale(user));
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("user", user);
-        variables.put("featuredPosts", featuredPosts);
-        variables.put("unsubscribeToken", generateUnsubscribeToken(user.getId()));
-        sendEmail(user.getEmail(), subject, EmailTemplate.PLATFORM_NEWS, variables, user.getLocale());
-    }
-
-    private void sendEmail(String to, String subject, EmailTemplate template, Map<String, Object> variables, String locale) {
-        EmailRetryTemplate.executeWithRetry(() -> {
-            checkRateLimit();
-
-            String htmlContent = renderTemplate(template, variables, locale);
-            Email from = new Email(fromEmail, fromName);
-            Email recipient = new Email(to);
-            Content content = new Content("text/html", htmlContent);
-
-            Mail mail = new Mail(from, subject, recipient, content);
-            mail.setReplyTo(new Email(fromEmail));
-
-            var response = sendGrid.api(new com.sendgrid.Request());
-            response.setMethod(com.sendgrid.Request.Method.POST);
-            response.setEndpoint("mail/send");
-            response.setBody(mail.build());
-
-            sendGrid.api(response);
-            recordEmailSent();
-            log.info("Email sent to {} with template {}", to, template);
-        }, "send email to " + to);
-    }
-
-    private String renderTemplate(EmailTemplate template, Map<String, Object> variables, String locale) {
-        Context context = new Context(new Locale(locale.toLowerCase()));
+    private String render(EmailTemplate template, Locale locale, Map<String, Object> variables) {
+        Context context = new Context(locale);
         context.setVariables(variables);
-
-        String templatePath = locale.equalsIgnoreCase("ES") ? template.getTemplatePathEs() : template.getTemplatePathEn();
-        return templateEngine.process(templatePath, context);
+        String name = Locale.ENGLISH.getLanguage().equals(locale.getLanguage()) ? template.getTemplatePathEn() : template.getTemplatePathEs();
+        return templateEngine.process(name, context);
     }
 
     private void checkRateLimit() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime hourStart = now.withMinute(0).withSecond(0).withNano(0);
-
-        HourlyEmailCount count = emailCounts.compute(hourStart.toString(), (k, v) -> {
-            if (v == null || !v.hourStart.equals(hourStart)) {
-                return new HourlyEmailCount(hourStart);
-            }
-            return v;
-        });
-
-        if (count.count.get() >= RATE_LIMIT_PER_HOUR) {
-            throw new RuntimeException("Rate limit exceeded: max 500 emails per hour");
+        String hourKey = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).toString();
+        int sent = sentPerHour.getOrDefault(hourKey, 0);
+        if (sent >= notificationProperties.getHourlyLimit()) {
+            throw new IllegalStateException("Hourly email limit reached");
         }
     }
 
-    private void recordEmailSent() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime hourStart = now.withMinute(0).withSecond(0).withNano(0);
-        HourlyEmailCount count = emailCounts.get(hourStart.toString());
-        if (count != null) {
-            count.count.incrementAndGet();
-        }
-    }
-
-    private String buildVerificationLink(String userId, String code) {
-        return unsubscribeBaseUrl + "/api/auth/verify?userId=" + userId + "&code=" + code;
-    }
-
-    private String buildPasswordResetLink(String userId, String token) {
-        return unsubscribeBaseUrl + "/api/auth/reset-password?userId=" + userId + "&token=" + token;
-    }
-
-    private String generateUnsubscribeToken(String userId) {
-        return java.util.Base64.getEncoder().encodeToString((userId + ":" + System.currentTimeMillis()).getBytes());
-    }
-
-    private Locale getLocale(User user) {
-        return new Locale(user.getLocale() != null ? user.getLocale().toLowerCase() : "en");
+    private void recordSend() {
+        String hourKey = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).toString();
+        sentPerHour.merge(hourKey, 1, Integer::sum);
     }
 }

@@ -1,14 +1,15 @@
 package com.karma.platform.service.notification;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-@Slf4j
 public class EmailRetryTemplate {
 
     private static final int MAX_RETRIES = 3;
     private static final long INITIAL_DELAY_MS = 1000;
+    private static final Logger log = LoggerFactory.getLogger(EmailRetryTemplate.class);
 
     public static <T> T executeWithRetry(Supplier<T> operation, String operationName) {
         int attempt = 1;

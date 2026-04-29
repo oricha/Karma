@@ -1,61 +1,55 @@
 package com.karma.platform.service.notification;
 
-import com.karma.platform.entity.User;
-import com.karma.platform.entity.Event;
-import com.karma.platform.entity.Order;
+import com.karma.platform.model.ReminderType;
+import com.karma.platform.persistence.entity.BlogPostEntity;
+import com.karma.platform.persistence.entity.EventEntity;
+import com.karma.platform.persistence.entity.OrderEntity;
+import com.karma.platform.persistence.entity.UserEntity;
+
 import java.util.List;
 
 public interface EmailService {
 
-    void sendWelcomeEmail(User user);
+    void sendWelcomeEmail(UserEntity user);
 
-    void sendEmailVerificationEmail(User user, String verificationCode);
+    void sendEmailVerificationEmail(UserEntity user, String verificationToken);
 
-    void sendPasswordResetEmail(User user, String resetToken);
+    void sendPasswordResetEmail(UserEntity user, String resetToken);
 
-    void sendRsvpConfirmationEmail(User user, Event event);
+    void sendRsvpConfirmationEmail(UserEntity user, EventEntity event);
 
-    void sendWaitlistPromotionEmail(User user, Event event);
+    void sendWaitlistPromotionEmail(UserEntity user, EventEntity event);
 
-    void sendOrderConfirmationEmail(User user, Order order);
+    void sendOrderConfirmationEmail(UserEntity user, OrderEntity order, EventEntity event);
 
-    void sendEventCancellationEmail(User user, Event event);
+    void sendEventCancellationEmail(UserEntity user, EventEntity event);
 
-    void sendReviewRequestEmail(User user, Event event);
+    void sendReviewRequestEmail(UserEntity user, EventEntity event);
 
-    void sendNewEventNotificationEmail(User user, Event event, String groupName);
+    void sendNewEventNotificationEmail(UserEntity user, EventEntity event, String groupName);
 
-    void sendWeeklyDigestEmail(User user, DigestContent digest);
+    void sendWeeklyDigestEmail(UserEntity user, DigestContent digestContent);
 
-    void sendEventReminderEmail(User user, Event event, ReminderType reminderType);
+    void sendPlatformNewsEmail(UserEntity user, List<BlogPostEntity> featuredPosts);
 
-    void sendPlatformNewsEmail(User user, List<BlogPostSummary> featuredPosts);
+    void sendEventReminderEmail(UserEntity user, EventEntity event, ReminderType reminderType);
 
-    public enum ReminderType {
-        SEVEN_DAY,
-        ONE_DAY,
-        TWO_HOUR
+    record DigestItem(
+            String eventId,
+            String slug,
+            String title,
+            String description,
+            String startsAt,
+            String city,
+            String venueName
+    ) {
     }
 
-    public class DigestContent {
-        public List<EventSummary> groupEvents;
-        public List<EventSummary> recommendedEvents;
-        public List<EventSummary> popularRegionalEvents;
-    }
-
-    public class EventSummary {
-        public String eventId;
-        public String title;
-        public String description;
-        public String startTime;
-        public String location;
-    }
-
-    public class BlogPostSummary {
-        public String postId;
-        public String title;
-        public String excerpt;
-        public String slug;
-        public String coverImageUrl;
+    record DigestContent(
+            List<DigestItem> groupEvents,
+            List<DigestItem> recommendedEvents,
+            List<DigestItem> popularEvents,
+            String unsubscribeToken
+    ) {
     }
 }

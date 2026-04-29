@@ -1,5 +1,6 @@
 server:
   port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -32,9 +33,10 @@ karma:
   frontend-origin: ${KARMA_FRONTEND_ORIGIN:http://localhost:8080}
   jwt:
     issuer: ${KARMA_JWT_ISSUER:karma-platform}
+    audience: ${KARMA_JWT_AUDIENCE:karma-platform-api}
     access-token-minutes: ${KARMA_JWT_ACCESS_TOKEN_MINUTES:15}
     refresh-token-days: ${KARMA_JWT_REFRESH_TOKEN_DAYS:7}
-    secret: ${KARMA_JWT_SECRET:karma-platform-local-dev-secret-key-change-me-please}
+    secret: ${KARMA_JWT_SECRET}
   i18n:
     default-locale: ${KARMA_DEFAULT_LOCALE:es}
     locale-cookie-name: ${KARMA_LOCALE_COOKIE_NAME:karma_locale}
@@ -61,6 +63,34 @@ karma:
     from-name: ${KARMA_EMAIL_FROM_NAME:Karma}
   notification:
     unsubscribe-base-url: ${KARMA_UNSUBSCRIBE_BASE_URL:https://karma.local}
+    hourly-limit: ${KARMA_NOTIFICATION_HOURLY_LIMIT:500}
+  schedulers:
+    digest-enabled: ${KARMA_SCHEDULER_DIGEST_ENABLED:true}
+    reminder-enabled: ${KARMA_SCHEDULER_REMINDER_ENABLED:true}
+    digest-cron: ${KARMA_SCHEDULER_DIGEST_CRON:0 0 9 * * MON}
+    reminder-daily-cron: ${KARMA_SCHEDULER_REMINDER_DAILY_CRON:0 0 0 * * *}
+    reminder-hourly-cron: ${KARMA_SCHEDULER_REMINDER_HOURLY_CRON:0 0 * * * *}
+  security:
+    require-https: ${KARMA_SECURITY_REQUIRE_HTTPS:false}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:}
+  from-email: ${KARMA_EMAIL_FROM:noreply@karma.local}
+  from-name: ${KARMA_EMAIL_FROM_NAME:Karma}

@@ -233,8 +233,12 @@ public class ApiMapper {
                 blogPost.getSlug(),
                 blogPost.getExcerptEs(),
                 blogPost.getExcerptEn(),
+                blogPost.getContentEs(),
+                blogPost.getContentEn(),
                 blogPost.getCoverImageUrl(),
-                blogPost.getPublishedAt().toString()
+                blogPost.isFeatured(),
+                blogPost.isPublished(),
+                blogPost.getPublishedAt() == null ? null : blogPost.getPublishedAt().toString()
         );
     }
 }

@@ -1,0 +1,3 @@
+karma:
+  jwt:
+    secret: ${KARMA_JWT_SECRET:karma-ci-secret-key-change-me-please-1234567890}

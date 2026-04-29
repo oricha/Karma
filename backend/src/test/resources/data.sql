@@ -1,12 +1,14 @@
 insert into app_users (id, email, password_hash, first_name, last_name, avatar_url, bio, phone, role, locale, email_verified, created_at, updated_at) values
 ('user-1', 'maria@karma.app', '{noop}password123', 'Maria', 'Luna', null, 'Facilitadora de danza consciente y ceremonias de cacao.', '+34111111111', 'ORGANIZER', 'es', true, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00'),
 ('user-2', 'carlos@karma.app', '{noop}password123', 'Carlos', 'Sanchez', null, 'Profesor de yoga y meditacion.', '+34222222222', 'ORGANIZER', 'es', true, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00'),
-('user-3', 'demo@karma.app', '{noop}demo123', 'Demo', 'User', null, 'Explorando eventos conscientes.', '+34999999999', 'USER', 'es', true, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00');
+('user-3', 'demo@karma.app', '{noop}demo123', 'Demo', 'User', null, 'Explorando eventos conscientes.', '+34999999999', 'USER', 'es', true, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00'),
+('user-4', 'admin@karma.app', '{noop}admin123', 'Admin', 'Karma', null, 'Administracion de contenidos y plataforma.', '+34333333333', 'ADMIN', 'es', true, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00');
 
 insert into user_preferences (user_id, newsletter_frequency, review_reminders, preferred_location, latitude, longitude, location_radius_km, created_at, updated_at) values
 ('user-1', 'MONTHLY', true, 'Madrid', 40.4168, -3.7038, 30, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00'),
 ('user-2', 'KARMA_ONLY', false, 'Barcelona', 41.3874, 2.1686, 40, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00'),
-('user-3', 'WEEKLY', true, 'Madrid', 40.4168, -3.7038, 50, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00');
+('user-3', 'WEEKLY', true, 'Madrid', 40.4168, -3.7038, 50, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00'),
+('user-4', 'NEVER', false, 'Madrid', 40.4168, -3.7038, 25, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00');
 
 insert into categories (id, slug, name_es, name_en, description_es, description_en, image_url, event_count, sort_order, created_at, updated_at) values
 ('cat-workshops', 'talleres', 'Talleres', 'Workshops', 'Talleres de bienestar', 'Wellness workshops', 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop', 128, 1, timestamp '2026-03-01 10:00:00', timestamp '2026-03-01 10:00:00'),
@@ -55,5 +57,5 @@ insert into saved_events (id, user_id, event_id, saved_at) values
 insert into event_orders (id, user_id, event_id, status, total_amount, currency, purchased_at) values
 ('order-1', 'user-3', 'event-1', 'PAID', 0.0, 'EUR', timestamp '2026-03-15 10:00:00');
 
-insert into blog_posts (id, title_es, title_en, slug, excerpt_es, excerpt_en, cover_image_url, published_at, created_at, updated_at) values
-('blog-1', '5 Beneficios de la Danza Extatica', '5 Benefits of Ecstatic Dance', '5-beneficios-danza-extatica', 'Descubre como la danza libre puede transformar tu bienestar.', 'Discover how free dance can transform your well-being.', null, date '2026-03-15', timestamp '2026-03-15 10:00:00', timestamp '2026-03-15 10:00:00');
+insert into blog_posts (id, title_es, title_en, slug, excerpt_es, excerpt_en, content_es, content_en, cover_image_url, featured, published, published_at, created_at, updated_at) values
+('blog-1', '5 Beneficios de la Danza Extatica', '5 Benefits of Ecstatic Dance', '5-beneficios-danza-extatica', 'Descubre como la danza libre puede transformar tu bienestar.', 'Discover how free dance can transform your well-being.', 'Contenido de muestra en espanol para el blog.', 'Sample English content for the blog post.', null, true, true, date '2026-03-15', timestamp '2026-03-15 10:00:00', timestamp '2026-03-15 10:00:00');

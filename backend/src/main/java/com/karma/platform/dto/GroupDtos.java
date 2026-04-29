@@ -42,7 +42,9 @@ public final class GroupDtos {
     public record GroupDetailResponse(
             GroupResponse group,
             List<EventDtos.EventResponse> upcomingEvents,
-            List<UserDtos.UserResponse> members
+            List<UserDtos.UserResponse> members,
+            int postCount,
+            String lastPostAt
     ) {
     }
 
@@ -67,6 +69,48 @@ public final class GroupDtos {
             String notificationPreference,
             String joinedAt,
             String approvedAt
+    ) {
+    }
+
+    public record GroupPostAuthorResponse(
+            String id,
+            String firstName,
+            String lastName,
+            String avatarUrl
+    ) {
+    }
+
+    public record GroupPostReplyResponse(
+            String id,
+            String postId,
+            GroupPostAuthorResponse author,
+            String content,
+            String createdAt
+    ) {
+    }
+
+    public record GroupPostResponse(
+            String id,
+            String groupId,
+            GroupPostAuthorResponse author,
+            String content,
+            String imageUrl,
+            boolean pinned,
+            int replyCount,
+            String createdAt,
+            String updatedAt,
+            List<GroupPostReplyResponse> replies
+    ) {
+    }
+
+    public record UpsertGroupPostRequest(
+            String content,
+            String imageUrl
+    ) {
+    }
+
+    public record UpsertGroupPostReplyRequest(
+            String content
     ) {
     }
 }

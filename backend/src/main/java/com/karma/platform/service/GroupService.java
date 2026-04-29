@@ -11,6 +11,7 @@ import com.karma.platform.persistence.entity.OrganizerProfileEntity;
 import com.karma.platform.persistence.entity.UserEntity;
 import com.karma.platform.persistence.repository.EventRepository;
 import com.karma.platform.persistence.repository.GroupMembershipRepository;
+import com.karma.platform.persistence.repository.GroupPostRepository;
 import com.karma.platform.persistence.repository.GroupRepository;
 import com.karma.platform.persistence.repository.OrganizerProfileRepository;
 import com.karma.platform.persistence.repository.UserRepository;
@@ -34,6 +35,7 @@ public class GroupService {
     private final OrganizerProfileRepository organizerProfileRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final GroupPostRepository groupPostRepository;
     private final DomainGeocodingService domainGeocodingService;
     private final ApiMapper apiMapper;
 
@@ -43,6 +45,7 @@ public class GroupService {
             OrganizerProfileRepository organizerProfileRepository,
             UserRepository userRepository,
             EventRepository eventRepository,
+            GroupPostRepository groupPostRepository,
             DomainGeocodingService domainGeocodingService,
             ApiMapper apiMapper
     ) {
@@ -51,6 +54,7 @@ public class GroupService {
         this.organizerProfileRepository = organizerProfileRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
+        this.groupPostRepository = groupPostRepository;
         this.domainGeocodingService = domainGeocodingService;
         this.apiMapper = apiMapper;
     }
@@ -69,6 +73,7 @@ public class GroupService {
     public GroupDtos.GroupDetailResponse detail(String slug) {
         GroupEntity group = groupRepository.findBySlug(slug)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.group-not-found", "Group not found"));
+        var posts = groupPostRepository.findByGroupIdOrderByPinnedDescCreatedAtDesc(group.getId());
         return new GroupDtos.GroupDetailResponse(
                 apiMapper.toGroup(group),
                 eventRepository.findByGroupId(group.getId()).stream().map(apiMapper::toEvent).toList(),
@@ -76,7 +81,9 @@ public class GroupService {
                         .map(membership -> userRepository.findById(membership.getUserId()).orElse(null))
                         .filter(java.util.Objects::nonNull)
                         .map(apiMapper::toUser)
-                        .toList()
+                        .toList(),
+                posts.size(),
+                posts.isEmpty() || posts.getFirst().getCreatedAt() == null ? null : posts.getFirst().getCreatedAt().toString()
         );
     }
 

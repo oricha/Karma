@@ -18,17 +18,20 @@ public class JwtService {
 
     private final SecretKey secretKey;
     private final String issuer;
+    private final String audience;
     private final long accessMinutes;
     private final long refreshDays;
 
     public JwtService(
             @Value("${karma.jwt.secret}") String secret,
             @Value("${karma.jwt.issuer}") String issuer,
+            @Value("${karma.jwt.audience}") String audience,
             @Value("${karma.jwt.access-token-minutes}") long accessMinutes,
             @Value("${karma.jwt.refresh-token-days}") long refreshDays
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.issuer = issuer;
+        this.audience = audience;
         this.accessMinutes = accessMinutes;
         this.refreshDays = refreshDays;
     }
@@ -42,15 +45,26 @@ public class JwtService {
     }
 
     public Claims parse(String token) {
-        return Jwts.parser().verifyWith(secretKey).requireIssuer(issuer).build()
+        Claims claims = Jwts.parser().verifyWith(secretKey).requireIssuer(issuer).build()
                 .parseSignedClaims(token)
                 .getPayload();
+        if (claims.getSubject() == null || claims.getSubject().isBlank()) {
+            throw new IllegalArgumentException("JWT subject is missing");
+        }
+        if (!claims.getAudience().contains(audience)) {
+            throw new IllegalArgumentException("JWT audience is invalid");
+        }
+        if (claims.get("type", String.class) == null) {
+            throw new IllegalArgumentException("JWT type is missing");
+        }
+        return claims;
     }
 
     private String buildToken(String userId, String email, String role, Instant expiresAt, String type) {
         return Jwts.builder()
                 .issuer(issuer)
                 .subject(userId)
+                .audience().add(audience).and()
                 .claims(Map.of("email", email, "role", role, "type", type))
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(expiresAt))

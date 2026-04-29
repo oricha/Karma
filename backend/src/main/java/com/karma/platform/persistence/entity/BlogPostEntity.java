@@ -30,10 +30,22 @@ public class BlogPostEntity extends AuditableEntity {
     @Column(name = "excerpt_en", nullable = false, length = 1000)
     private String excerptEn;
 
+    @Column(name = "content_es", length = 20000)
+    private String contentEs;
+
+    @Column(name = "content_en", length = 20000)
+    private String contentEn;
+
     @Column(name = "cover_image_url", length = 1000)
     private String coverImageUrl;
 
-    @Column(name = "published_at", nullable = false)
+    @Column(nullable = false)
+    private boolean featured;
+
+    @Column(nullable = false)
+    private boolean published;
+
+    @Column(name = "published_at")
     private LocalDate publishedAt;
 
     public String getId() {
@@ -90,6 +102,38 @@ public class BlogPostEntity extends AuditableEntity {
 
     public void setCoverImageUrl(String coverImageUrl) {
         this.coverImageUrl = coverImageUrl;
+    }
+
+    public String getContentEs() {
+        return contentEs;
+    }
+
+    public void setContentEs(String contentEs) {
+        this.contentEs = contentEs;
+    }
+
+    public String getContentEn() {
+        return contentEn;
+    }
+
+    public void setContentEn(String contentEn) {
+        this.contentEn = contentEn;
+    }
+
+    public boolean isFeatured() {
+        return featured;
+    }
+
+    public void setFeatured(boolean featured) {
+        this.featured = featured;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
     public LocalDate getPublishedAt() {
