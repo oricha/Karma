@@ -22,6 +22,7 @@ import OrdersPage from "./pages/account/OrdersPage";
 import AccountDetailsPage from "./pages/account/AccountDetailsPage";
 import PreferencesPage from "./pages/account/PreferencesPage";
 import SavedEventsPage from "./pages/account/SavedEventsPage";
+import OrganizerDashboardPage from "./pages/organizer/OrganizerDashboardPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -56,6 +57,7 @@ const App = () => (
                   <Route path="/account/details" element={<AccountDetailsPage />} />
                   <Route path="/account/preferences" element={<PreferencesPage />} />
                   <Route path="/account/saved-events" element={<SavedEventsPage />} />
+                  <Route path="/organizer/dashboard" element={<OrganizerDashboardPage />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>

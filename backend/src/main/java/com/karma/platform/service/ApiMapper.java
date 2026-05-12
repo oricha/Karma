@@ -1,8 +1,9 @@
 package com.karma.platform.service;
 
 import com.karma.platform.dto.*;
-import com.karma.platform.model.*;
-import com.karma.platform.seed.PlatformDataStore;
+import com.karma.platform.model.RsvpStatus;
+import com.karma.platform.persistence.entity.*;
+import com.karma.platform.persistence.repository.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,185 +11,254 @@ import java.util.List;
 @Component
 public class ApiMapper {
 
-    private final PlatformDataStore dataStore;
+    private final CategoryRepository categoryRepository;
+    private final ThemeRepository themeRepository;
+    private final OrganizerProfileRepository organizerProfileRepository;
+    private final GroupRepository groupRepository;
+    private final EventRepository eventRepository;
+    private final EventThemeRepository eventThemeRepository;
+    private final RsvpRepository rsvpRepository;
+    private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
-    public ApiMapper(PlatformDataStore dataStore) {
-        this.dataStore = dataStore;
+    public ApiMapper(
+            CategoryRepository categoryRepository,
+            ThemeRepository themeRepository,
+            OrganizerProfileRepository organizerProfileRepository,
+            GroupRepository groupRepository,
+            EventRepository eventRepository,
+            EventThemeRepository eventThemeRepository,
+            RsvpRepository rsvpRepository,
+            ReviewRepository reviewRepository,
+            UserRepository userRepository
+    ) {
+        this.categoryRepository = categoryRepository;
+        this.themeRepository = themeRepository;
+        this.organizerProfileRepository = organizerProfileRepository;
+        this.groupRepository = groupRepository;
+        this.eventRepository = eventRepository;
+        this.eventThemeRepository = eventThemeRepository;
+        this.rsvpRepository = rsvpRepository;
+        this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
     }
 
-    public UserDtos.UserResponse toUser(User user) {
+    public UserDtos.UserResponse toUser(UserEntity user) {
         return new UserDtos.UserResponse(
-                user.id(),
-                user.email(),
-                user.firstName(),
-                user.lastName(),
-                user.avatarUrl(),
-                user.bio(),
-                user.phone(),
-                user.role(),
-                user.locale(),
-                user.emailVerified()
+                user.getId(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getAvatarUrl(),
+                user.getBio(),
+                user.getPhone(),
+                user.getRole(),
+                user.getLocale(),
+                user.isEmailVerified()
         );
     }
 
-    public UserDtos.UserPreferenceResponse toPreference(UserPreference preference) {
+    public UserDtos.UserPreferenceResponse toPreference(UserPreferenceEntity preference, List<String> themeIds) {
         return new UserDtos.UserPreferenceResponse(
-                preference.newsletterFrequency(),
-                preference.reviewReminders(),
-                preference.preferredLocation(),
-                preference.latitude(),
-                preference.longitude(),
-                preference.locationRadiusKm(),
-                preference.themeIds()
+                preference.getNewsletterFrequency(),
+                preference.isReviewReminders(),
+                preference.getPreferredLocation(),
+                preference.getLatitude(),
+                preference.getLongitude(),
+                preference.getLocationRadiusKm(),
+                themeIds
         );
     }
 
-    public CatalogDtos.CategoryResponse toCategory(Category category) {
+    public CatalogDtos.CategoryResponse toCategory(CategoryEntity category) {
         return new CatalogDtos.CategoryResponse(
-                category.id(),
-                category.nameEs(),
-                category.nameEn(),
-                category.slug(),
-                category.descriptionEs(),
-                category.descriptionEn(),
-                category.imageUrl(),
-                category.eventCount()
+                category.getId(),
+                category.getNameEs(),
+                category.getNameEn(),
+                category.getSlug(),
+                category.getDescriptionEs(),
+                category.getDescriptionEn(),
+                category.getImageUrl(),
+                category.getEventCount()
         );
     }
 
-    public CatalogDtos.ThemeResponse toTheme(Theme theme) {
+    public CatalogDtos.ThemeResponse toTheme(ThemeEntity theme) {
         return new CatalogDtos.ThemeResponse(
-                theme.id(),
-                theme.categoryId(),
-                theme.nameEs(),
-                theme.nameEn(),
-                theme.slug()
+                theme.getId(),
+                theme.getCategoryId(),
+                theme.getNameEs(),
+                theme.getNameEn(),
+                theme.getSlug()
         );
     }
 
-    public GroupDtos.OrganizerResponse toOrganizer(OrganizerProfile organizerProfile) {
+    public GroupDtos.OrganizerResponse toOrganizer(OrganizerProfileEntity organizerProfile) {
         return new GroupDtos.OrganizerResponse(
-                organizerProfile.id(),
-                organizerProfile.userId(),
-                organizerProfile.name(),
-                organizerProfile.slug(),
-                organizerProfile.bio(),
-                organizerProfile.website(),
-                organizerProfile.logoUrl(),
-                organizerProfile.verified()
+                organizerProfile.getId(),
+                organizerProfile.getUserId(),
+                organizerProfile.getName(),
+                organizerProfile.getSlug(),
+                organizerProfile.getBio(),
+                organizerProfile.getWebsite(),
+                organizerProfile.getLogoUrl(),
+                organizerProfile.isVerified()
         );
     }
 
-    public GroupDtos.GroupResponse toGroup(Group group) {
+    public GroupDtos.GroupResponse toGroup(GroupEntity group) {
         return toGroup(group, null);
     }
 
-    public GroupDtos.GroupResponse toGroup(Group group, String notificationPreference) {
-        OrganizerProfile organizer = dataStore.organizerById(group.organizerId());
-        Category category = dataStore.categoryBySlug(dataStore.categories().stream()
-                .filter(item -> item.id().equals(group.categoryId()))
-                .map(Category::slug)
-                .findFirst()
-                .orElse("")).orElse(null);
-        int upcomingEvents = (int) dataStore.eventsByGroup(group.id()).stream().filter(event -> event.status() == EventStatus.PUBLISHED).count();
+    public GroupDtos.GroupResponse toGroup(GroupEntity group, String notificationPreference) {
+        OrganizerProfileEntity organizer = organizerProfileRepository.findById(group.getOrganizerId()).orElse(null);
+        CategoryEntity category = categoryRepository.findById(group.getCategoryId()).orElse(null);
+        int upcomingEvents = (int) eventRepository.findByGroupId(group.getId()).stream()
+                .filter(event -> event.getStatus() == com.karma.platform.model.EventStatus.PUBLISHED)
+                .count();
         return new GroupDtos.GroupResponse(
-                group.id(),
-                group.organizerId(),
+                group.getId(),
+                group.getOrganizerId(),
                 organizer == null ? null : toOrganizer(organizer),
-                group.name(),
-                group.slug(),
-                group.description(),
-                group.categoryId(),
+                group.getName(),
+                group.getSlug(),
+                group.getDescription(),
+                group.getCategoryId(),
                 category == null ? null : toCategory(category),
-                group.bannerUrl(),
-                group.city(),
-                group.country(),
+                group.getBannerUrl(),
+                group.getCity(),
+                group.getCountry(),
                 group.isPrivate(),
-                group.status().name(),
-                group.memberCount(),
+                group.getStatus().name(),
+                group.getMemberCount(),
                 upcomingEvents,
                 notificationPreference
         );
     }
 
-    public EventDtos.EventResponse toEvent(Event event) {
-        OrganizerProfile organizer = dataStore.organizerById(event.organizerId());
-        Group group = event.groupId() == null ? null : dataStore.groupById(event.groupId()).orElse(null);
-        Category category = dataStore.categories().stream().filter(item -> item.id().equals(event.categoryId())).findFirst().orElse(null);
-        List<CatalogDtos.ThemeResponse> themeResponses = event.themeIds().stream()
-                .map(id -> dataStore.themes().stream().filter(theme -> theme.id().equals(id)).findFirst().orElse(null))
+    public EventDtos.EventResponse toEvent(EventEntity event) {
+        return toEvent(event, reviewRepository.averageRatingByEventId(event.getId()), reviewRepository.countByEventId(event.getId()));
+    }
+
+    public EventDtos.EventResponse toEvent(EventEntity event, Double averageRating, long reviewCount) {
+        OrganizerProfileEntity organizer = organizerProfileRepository.findById(event.getOrganizerId()).orElse(null);
+        GroupEntity group = event.getGroupId() == null ? null : groupRepository.findById(event.getGroupId()).orElse(null);
+        CategoryEntity category = categoryRepository.findById(event.getCategoryId()).orElse(null);
+        List<CatalogDtos.ThemeResponse> themeResponses = eventThemeRepository.findByEventId(event.getId()).stream()
+                .map(item -> themeRepository.findById(item.getThemeId()).orElse(null))
                 .filter(java.util.Objects::nonNull)
                 .map(this::toTheme)
                 .toList();
         return new EventDtos.EventResponse(
-                event.id(),
-                event.organizerId(),
+                event.getId(),
+                event.getOrganizerId(),
                 organizer == null ? null : toOrganizer(organizer),
-                event.groupId(),
+                event.getGroupId(),
                 group == null ? null : toGroup(group),
-                event.title(),
-                event.slug(),
-                event.description(),
-                event.coverImageUrl(),
-                event.startDate().toString(),
-                event.endDate() == null ? null : event.endDate().toString(),
-                event.venueName(),
-                event.address(),
-                event.city(),
-                event.country(),
+                event.getTitle(),
+                event.getSlug(),
+                event.getDescription(),
+                event.getCoverImageUrl(),
+                event.getStartDate().toString(),
+                event.getEndDate() == null ? null : event.getEndDate().toString(),
+                event.getVenueName(),
+                event.getAddress(),
+                event.getCity(),
+                event.getCountry(),
                 event.isOnline(),
                 event.isHybrid(),
-                event.onlineUrl(),
-                event.status().name(),
-                event.featured(),
-                event.maxAttendees(),
-                dataStore.attendeeCount(event.id()),
+                event.getOnlineUrl(),
+                event.getStatus().name(),
+                event.isFeatured(),
+                event.getMaxAttendees(),
+                Math.toIntExact(rsvpRepository.countByEventIdAndStatus(event.getId(), RsvpStatus.YES)),
                 event.isFree(),
-                event.price(),
-                event.currency(),
-                event.language(),
+                event.getPrice(),
+                event.getCurrency(),
+                event.getLanguage(),
                 themeResponses,
                 category == null ? null : toCategory(category),
-                4.8,
-                12
+                averageRating == null ? null : Math.round(averageRating * 10.0) / 10.0,
+                Math.toIntExact(reviewCount)
         );
     }
 
-    public EventDtos.RsvpResponse toRsvp(Rsvp rsvp) {
+    public EventDtos.ReviewResponse toReview(ReviewEntity review) {
+        UserEntity user = userRepository.findById(review.getUserId()).orElse(null);
+        EventDtos.ReviewAuthorResponse author = user == null
+                ? null
+                : new EventDtos.ReviewAuthorResponse(user.getId(), user.getFirstName(), user.getLastName(), user.getAvatarUrl());
+        return new EventDtos.ReviewResponse(
+                review.getId(),
+                review.getEventId(),
+                review.getUserId(),
+                author,
+                review.getRating(),
+                review.getComment(),
+                review.getCreatedAt() == null ? null : review.getCreatedAt().toString(),
+                review.getUpdatedAt() == null ? null : review.getUpdatedAt().toString()
+        );
+    }
+
+    public EventDtos.RsvpResponse toRsvp(RsvpEntity rsvp) {
         return new EventDtos.RsvpResponse(
-                rsvp.id(),
-                rsvp.eventId(),
-                rsvp.userId(),
-                rsvp.status().name(),
-                rsvp.waitlistPosition(),
-                rsvp.checkedIn()
+                rsvp.getId(),
+                rsvp.getEventId(),
+                rsvp.getUserId(),
+                rsvp.getStatus().name(),
+                rsvp.getWaitlistPosition(),
+                rsvp.isCheckedIn(),
+                rsvp.isNoShow()
         );
     }
 
-    public OrderDtos.OrderResponse toOrder(Order order) {
-        Event event = dataStore.eventById(order.eventId()).orElse(null);
+    public OrderDtos.OrderResponse toOrder(OrderEntity order) {
+        EventEntity event = eventRepository.findById(order.getEventId()).orElse(null);
         return new OrderDtos.OrderResponse(
-                order.id(),
-                order.userId(),
-                order.eventId(),
+                order.getId(),
+                order.getUserId(),
+                order.getEventId(),
                 event == null ? null : toEvent(event),
-                order.status().name(),
-                order.totalAmount(),
-                order.currency(),
-                order.purchasedAt().toString()
+                order.getStatus().name(),
+                order.getTotalAmount(),
+                order.getCurrency(),
+                order.getPurchasedAt().toString(),
+                order.getStripeSessionId()
         );
     }
 
-    public BlogDtos.BlogPostResponse toBlogPost(BlogPost blogPost) {
+    public OrderDtos.TicketTypeResponse toTicketType(TicketTypeEntity ticketType) {
+        return new OrderDtos.TicketTypeResponse(
+                ticketType.getId(),
+                ticketType.getEventId(),
+                ticketType.getName(),
+                ticketType.getDescription(),
+                ticketType.getPrice(),
+                ticketType.getCurrency(),
+                ticketType.getQuantity(),
+                ticketType.getSoldCount(),
+                ticketType.getEarlyBirdPrice(),
+                ticketType.getEarlyBirdQuantity(),
+                ticketType.getEarlyBirdDeadline() == null ? null : ticketType.getEarlyBirdDeadline().toString(),
+                ticketType.getSaleStart() == null ? null : ticketType.getSaleStart().toString(),
+                ticketType.getSaleEnd() == null ? null : ticketType.getSaleEnd().toString()
+        );
+    }
+
+    public BlogDtos.BlogPostResponse toBlogPost(BlogPostEntity blogPost) {
         return new BlogDtos.BlogPostResponse(
-                blogPost.id(),
-                blogPost.titleEs(),
-                blogPost.titleEn(),
-                blogPost.slug(),
-                blogPost.excerptEs(),
-                blogPost.excerptEn(),
-                blogPost.coverImageUrl(),
-                blogPost.publishedAt().toString()
+                blogPost.getId(),
+                blogPost.getTitleEs(),
+                blogPost.getTitleEn(),
+                blogPost.getSlug(),
+                blogPost.getExcerptEs(),
+                blogPost.getExcerptEn(),
+                blogPost.getContentEs(),
+                blogPost.getContentEn(),
+                blogPost.getCoverImageUrl(),
+                blogPost.isFeatured(),
+                blogPost.isPublished(),
+                blogPost.getPublishedAt() == null ? null : blogPost.getPublishedAt().toString()
         );
     }
 }

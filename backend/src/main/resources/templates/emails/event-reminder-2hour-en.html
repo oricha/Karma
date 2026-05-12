@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>Event Reminder</title><style>body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; } .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; } .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #ff0000; } .event-box { background: #ffe0e0; padding: 15px; border-left: 4px solid #ff0000; margin: 20px 0; } .footer { text-align: center; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }</style></head>
+<body>
+<div class="container">
+    <div class="header"><h1>Your event starts in 2 hours!</h1></div>
+    <div class="content">
+        <p>Hello <span th:text="${user.name}">User</span>,</p>
+        <p>Your event starts in 2 hours! Get ready to attend:</p>
+        <div class="event-box">
+            <h3 th:text="${event.title}">Event</h3>
+            <p><strong>Location:</strong> <span th:text="${event.location}">Location</span></p>
+            <p th:text="${event.description}">Description</p>
+        </div>
+        <p>See you in 2 hours!</p>
+    </div>
+    <div class="footer"><p>&copy; 2026 Karma Platform</p></div>
+</div>
+</body>
+</html>

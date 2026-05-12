@@ -89,6 +89,8 @@ export interface Event {
   language: string;
   themes?: Theme[];
   category?: Category;
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 export interface RSVP {
@@ -145,4 +147,43 @@ export interface BlogPost {
   excerptEn?: string;
   coverImageUrl?: string;
   publishedAt?: string;
+}
+
+export interface ReviewAuthor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+}
+
+export interface Review {
+  id: string;
+  eventId: string;
+  userId: string;
+  author?: ReviewAuthor;
+  rating: number;
+  comment?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganizerActivity {
+  type: 'ORDER' | 'REVIEW';
+  title: string;
+  description: string;
+  occurredAt: string;
+  eventId?: string;
+  eventSlug?: string;
+  eventTitle?: string;
+}
+
+export interface OrganizerDashboard {
+  upcomingEvents: number;
+  totalRsvps: number;
+  totalTicketsSold: number;
+  totalRevenue: number;
+  averageRating: number;
+  totalReviews: number;
+  recentEvents: Event[];
+  recentActivity: OrganizerActivity[];
 }

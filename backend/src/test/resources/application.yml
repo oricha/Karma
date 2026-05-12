@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:karma-test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: false
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-drop
+  sql:
+    init:
+      mode: always
+  jackson:
+    time-zone: UTC
+
+karma:
+  frontend-origin: http://localhost:8080
+  i18n:
+    default-locale: es
+    locale-cookie-name: karma_locale
+  storage:
+    max-upload-size-bytes: 10485760
+  jwt:
+    issuer: karma-platform
+    audience: karma-platform-api
+    access-token-minutes: 15
+    refresh-token-days: 7
+    secret: karma-platform-local-dev-secret-key-change-me-please

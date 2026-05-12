@@ -1,4 +1,10 @@
 .DS_Store
+.idea/
+.claude/
+.agents/
+.kiro/
+openspec/
+CLAUDE.md
 .env
 .env.*
 
@@ -37,3 +43,6 @@ backend/*.sqlite3
 tmp/
 *.swp
 *.swo
+DOKPLOY_DEPLOY.md
+FEATURES.md
+PROMPT_v1.md

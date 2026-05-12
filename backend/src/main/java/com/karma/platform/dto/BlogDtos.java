@@ -12,8 +12,25 @@ public final class BlogDtos {
             String slug,
             String excerptEs,
             String excerptEn,
+            String contentEs,
+            String contentEn,
             String coverImageUrl,
+            boolean featured,
+            boolean published,
             String publishedAt
+    ) {
+    }
+
+    public record UpsertBlogPostRequest(
+            String titleEs,
+            String titleEn,
+            String excerptEs,
+            String excerptEn,
+            String contentEs,
+            String contentEn,
+            String coverImageUrl,
+            boolean featured,
+            boolean published
     ) {
     }
 }

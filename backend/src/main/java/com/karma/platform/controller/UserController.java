@@ -7,7 +7,9 @@ import com.karma.platform.dto.OrderDtos;
 import com.karma.platform.dto.UserDtos;
 import com.karma.platform.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,6 +33,21 @@ public class UserController {
     @PutMapping
     public UserDtos.UserResponse update(@Valid @RequestBody UserDtos.UpdateUserRequest request) {
         return userService.update(currentUser.id(), request);
+    }
+
+    @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserDtos.UserResponse uploadAvatar(@RequestPart("file") MultipartFile file) {
+        return userService.uploadAvatar(currentUser.id(), file);
+    }
+
+    @PutMapping("/password")
+    public UserDtos.ActionResponse changePassword(@Valid @RequestBody UserDtos.ChangePasswordRequest request) {
+        return userService.changePassword(currentUser.id(), request);
+    }
+
+    @PutMapping("/email")
+    public UserDtos.EmailChangeResponse changeEmail(@Valid @RequestBody UserDtos.ChangeEmailRequest request) {
+        return userService.changeEmail(currentUser.id(), request);
     }
 
     @GetMapping("/preferences")

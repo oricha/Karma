@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bienvenido a Karma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>¡Bienvenido a Karma!</h1>
+    </div>
+
+    <div class="content">
+        <p>Hola <span th:text="${user.name}">Usuario</span>,</p>
+
+        <p>Gracias por registrarte en Karma. Estamos emocionados de tenerte en nuestra comunidad de bienestar y espiritualidad.</p>
+
+        <p>Tu cuenta ha sido creada exitosamente. Ahora puedes:</p>
+        <ul>
+            <li>Explorar eventos en tu área</li>
+            <li>Unirte a grupos de interés</li>
+            <li>Conectar con otros en la comunidad</li>
+            <li>Gestionar tus preferencias</li>
+        </ul>
+
+        <p>Si tienes preguntas, no dudes en contactarnos.</p>
+
+        <p>¡Que disfrutes tu experiencia en Karma!</p>
+
+        <p>
+            <em>El equipo de Karma</em>
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Karma Platform. Todos los derechos reservados.</p>
+    </div>
+</div>
+</body>
+</html>

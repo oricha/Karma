@@ -1,0 +1,23 @@
+{
+  "eyebrow": "Organizer dashboard",
+  "title": "Operational overview",
+  "subtitle": "Track event momentum, community response, and recent activity from a single control surface.",
+  "reviewsCount": "{{count}} total reviews",
+  "recentEventsTitle": "Recent events",
+  "recentActivityTitle": "Recent activity",
+  "emptyEvents": "There are no recent events to show yet.",
+  "emptyActivity": "There is no recent activity yet.",
+  "metrics": {
+    "upcomingEvents": "Upcoming events",
+    "totalRsvps": "Confirmed RSVPs",
+    "totalTicketsSold": "Tickets sold",
+    "totalRevenue": "Revenue",
+    "averageRating": "Average rating"
+  },
+  "activity": {
+    "types": {
+      "ORDER": "Order",
+      "REVIEW": "Review"
+    }
+  }
+}

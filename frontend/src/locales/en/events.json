@@ -30,7 +30,12 @@
     "waitlist": "Waitlist",
     "eventFull": "Event full — Join the waitlist",
     "moreAttendees": "+{{count}} more",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "reviewPlaceholder": "How was the experience?",
+    "publishReview": "Publish review",
+    "updateReview": "Update review",
+    "deleteReview": "Delete review",
+    "noReviews": "There are no reviews for this event yet."
   },
   "rsvp": {
     "attending": "Attending",

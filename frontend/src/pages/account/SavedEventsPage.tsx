@@ -9,6 +9,9 @@ import { api } from '@/lib/api';
 const SavedEventsPage = () => {
   const { t } = useTranslation('account');
   const { data: events = [] } = useQuery({ queryKey: ['saved-events'], queryFn: api.getSavedEvents });
+  const now = new Date();
+  const upcomingEvents = events.filter((event) => new Date(event.startDate) >= now);
+  const pastEvents = events.filter((event) => new Date(event.startDate) < now);
 
   return (
     <AccountLayout>
@@ -20,11 +23,15 @@ const SavedEventsPage = () => {
         </TabsList>
         <TabsContent value="upcoming">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {events.map(e => <EventCard key={e.id} event={e} />)}
+            {upcomingEvents.length
+              ? upcomingEvents.map((event) => <EventCard key={event.id} event={event} />)
+              : <EmptyState message={t('savedEvents.empty')} linkText={t('common:buttons.discover')} linkTo="/events" />}
           </div>
         </TabsContent>
         <TabsContent value="past">
-          <EmptyState message={t('savedEvents.empty')} linkText={t('common:buttons.discover')} linkTo="/events" />
+          {pastEvents.length
+            ? <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{pastEvents.map((event) => <EventCard key={event.id} event={event} />)}</div>
+            : <EmptyState message={t('savedEvents.empty')} linkText={t('common:buttons.discover')} linkTo="/events" />}
         </TabsContent>
       </Tabs>
     </AccountLayout>

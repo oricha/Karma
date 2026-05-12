@@ -30,7 +30,12 @@
     "waitlist": "Lista de espera",
     "eventFull": "Evento lleno — Unirse a la lista de espera",
     "moreAttendees": "+{{count}} más",
-    "reviews": "Reseñas"
+    "reviews": "Reseñas",
+    "reviewPlaceholder": "¿Cómo fue la experiencia?",
+    "publishReview": "Publicar reseña",
+    "updateReview": "Actualizar reseña",
+    "deleteReview": "Eliminar reseña",
+    "noReviews": "Todavía no hay reseñas para este evento."
   },
   "rsvp": {
     "attending": "Asistiré",

@@ -5,8 +5,6 @@ import com.karma.platform.dto.OrderDtos;
 import com.karma.platform.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -20,8 +18,8 @@ public class OrderController {
     }
 
     @PostMapping("/checkout")
-    public OrderDtos.CheckoutResponse checkout(@RequestBody Map<String, String> payload) {
-        return orderService.checkout(currentUser.id(), payload.get("eventId"));
+    public OrderDtos.CheckoutResponse checkout(@RequestBody OrderDtos.CheckoutRequest request) {
+        return orderService.checkout(currentUser.id(), request);
     }
 
     @GetMapping("/{id}")

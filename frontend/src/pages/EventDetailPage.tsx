@@ -2,34 +2,81 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Calendar, MapPin, Users, Heart, Share2, Clock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Calendar, MapPin, Users, Heart, Share2, Clock, Star, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
 import EventCard from '@/components/events/EventCard';
 import { api } from '@/lib/api';
 import { useSession } from '@/hooks/use-session';
+import { toast } from '@/components/ui/sonner';
 
 const EventDetailPage = () => {
   const { slug } = useParams();
   const { t, i18n } = useTranslation('events');
   const locale = i18n.language === 'es' ? es : enUS;
   const queryClient = useQueryClient();
-  const { isLoggedIn } = useSession();
+  const { isLoggedIn, user } = useSession();
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
   const { data } = useQuery({
     queryKey: ['event', slug],
     queryFn: () => api.getEvent(slug!),
     enabled: Boolean(slug),
   });
+  const { data: savedEvents = [] } = useQuery({
+    queryKey: ['saved-events'],
+    queryFn: api.getSavedEvents,
+    enabled: isLoggedIn,
+  });
   const event = data?.event;
   const relatedEvents = data?.relatedEvents ?? [];
+  const reviews = data?.reviews ?? [];
+  const myReview = reviews.find((review) => review.userId === user?.id);
+  const isSaved = savedEvents.some((savedEvent) => savedEvent.id === event?.id);
   const rsvpMutation = useMutation({
     mutationFn: () => api.rsvpEvent(event!.id),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['event', slug] }),
   });
   const saveMutation = useMutation({
-    mutationFn: () => api.saveEvent(event!.id),
+    mutationFn: () => (isSaved ? api.unsaveEvent(event!.id) : api.saveEvent(event!.id)),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['saved-events'] });
+      toast.success(isSaved ? 'Evento eliminado de guardados' : 'Evento guardado');
+    },
   });
+  const reviewMutation = useMutation({
+    mutationFn: () => (myReview
+      ? api.updateReview(event!.id, { rating, comment })
+      : api.createReview(event!.id, { rating, comment })),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['event', slug] });
+      toast.success(myReview ? 'Reseña actualizada' : 'Reseña publicada');
+      setComment('');
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+  const deleteReviewMutation = useMutation({
+    mutationFn: () => api.deleteReview(event!.id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['event', slug] });
+      setRating(5);
+      setComment('');
+      toast.success('Reseña eliminada');
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+  useEffect(() => {
+    if (myReview) {
+      setComment(myReview.comment ?? '');
+      setRating(myReview.rating);
+      return;
+    }
+    setComment('');
+    setRating(5);
+  }, [myReview]);
   if (!event) return null;
   const capacityPercent = event.maxAttendees ? ((event.currentAttendees || 0) / event.maxAttendees) * 100 : 0;
   const isFull = capacityPercent >= 100;
@@ -74,8 +121,13 @@ const EventDetailPage = () => {
               </div>
 
               <div className="flex gap-3 mb-8">
-                <Button variant="ghost" size="sm" className="rounded-full font-body gap-2">
-                  <Heart className="h-4 w-4" onClick={() => saveMutation.mutate()} /> {t('common:buttons.save')}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full font-body gap-2"
+                  onClick={() => isLoggedIn && saveMutation.mutate()}
+                >
+                  <Heart className={`h-4 w-4 ${isSaved ? 'fill-coral text-coral' : ''}`} /> {t('common:buttons.save')}
                 </Button>
                 <Button variant="ghost" size="sm" className="rounded-full font-body gap-2">
                   <Share2 className="h-4 w-4" /> {t('common:buttons.share')}
@@ -86,6 +138,78 @@ const EventDetailPage = () => {
               <p className="font-body text-muted-foreground leading-relaxed whitespace-pre-line">
                 {event.description || 'Una experiencia transformadora que te invita a reconectar contigo y con la comunidad. Ven con ropa cómoda y mente abierta.'}
               </p>
+            </div>
+
+            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-sm mb-6">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-heading text-xl font-semibold">{t('detail.reviews')}</h2>
+                  <p className="font-body text-sm text-muted-foreground">
+                    {(event.averageRating ?? 0).toFixed(1)} ★ · {event.reviewCount ?? 0}
+                  </p>
+                </div>
+              </div>
+
+              {isLoggedIn && (
+                <div className="mb-8 rounded-2xl border border-border p-4">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        className="rounded-full border border-border px-3 py-1 text-sm transition-colors hover:bg-muted"
+                        onClick={() => setRating(value)}
+                      >
+                        <span className="inline-flex items-center gap-1">
+                          <Star className={`h-4 w-4 ${value <= rating ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
+                          {value}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <Textarea
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                    placeholder={t('detail.reviewPlaceholder')}
+                    className="min-h-28"
+                  />
+                  <div className="mt-4 flex gap-3">
+                    <Button onClick={() => reviewMutation.mutate()} disabled={reviewMutation.isPending}>
+                      {myReview ? t('detail.updateReview') : t('detail.publishReview')}
+                    </Button>
+                    {myReview && (
+                      <Button variant="outline" onClick={() => deleteReviewMutation.mutate()} disabled={deleteReviewMutation.isPending}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {t('detail.deleteReview')}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {reviews.length ? reviews.map((review) => (
+                  <article key={review.id} className="rounded-2xl border border-border px-4 py-4">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-body font-semibold">
+                          {[review.author?.firstName, review.author?.lastName].filter(Boolean).join(' ')}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(review.createdAt), 'd MMM yyyy', { locale })}
+                        </p>
+                      </div>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm font-medium">
+                        <Star className="h-4 w-4 fill-primary text-primary" />
+                        {review.rating}
+                      </span>
+                    </div>
+                    {review.comment && <p className="font-body text-sm text-muted-foreground">{review.comment}</p>}
+                  </article>
+                )) : (
+                  <p className="font-body text-sm text-muted-foreground">{t('detail.noReviews')}</p>
+                )}
+              </div>
             </div>
 
             {/* Related events */}

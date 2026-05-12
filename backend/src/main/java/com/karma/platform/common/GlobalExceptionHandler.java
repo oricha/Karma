@@ -24,12 +24,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Map<String, Object>> handleApiException(ApiException exception) {
-        return ResponseEntity.status(exception.getStatus()).body(body(exception.getStatus(), exception.getMessage()));
+        return ResponseEntity.status(exception.getStatus())
+                .body(body(exception.getStatus(), localized(exception.getMessageCode(), exception.getMessage(), exception.getMessageArgs())));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException exception) {
-        Map<String, Object> body = body(HttpStatus.BAD_REQUEST, localized("error.validation"));
+        Map<String, Object> body = body(HttpStatus.BAD_REQUEST, localized("error.validation", "Validation error"));
         Map<String, String> errors = new LinkedHashMap<>();
         for (FieldError fieldError : exception.getBindingResult().getFieldErrors()) {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleUnexpected(Exception exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(body(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage()));
+                .body(body(HttpStatus.INTERNAL_SERVER_ERROR, localized("error.internal-server", "Internal server error")));
     }
 
     private Map<String, Object> body(HttpStatus status, String message) {
@@ -53,7 +54,10 @@ public class GlobalExceptionHandler {
         return response;
     }
 
-    private String localized(String key) {
-        return messageSource.getMessage(key, null, key, LocaleContextHolder.getLocale());
+    private String localized(String key, String fallback, Object... args) {
+        if (key == null) {
+            return fallback;
+        }
+        return messageSource.getMessage(key, args, fallback, LocaleContextHolder.getLocale());
     }
 }

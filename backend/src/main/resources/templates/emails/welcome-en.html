@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Welcome to Karma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Welcome to Karma!</h1>
+    </div>
+
+    <div class="content">
+        <p>Hello <span th:text="${user.name}">User</span>,</p>
+
+        <p>Thank you for signing up at Karma. We're excited to have you in our wellness and spirituality community.</p>
+
+        <p>Your account has been created successfully. You can now:</p>
+        <ul>
+            <li>Explore events in your area</li>
+            <li>Join interest-based groups</li>
+            <li>Connect with others in the community</li>
+            <li>Manage your preferences</li>
+        </ul>
+
+        <p>If you have any questions, please don't hesitate to reach out.</p>
+
+        <p>Enjoy your experience on Karma!</p>
+
+        <p>
+            <em>The Karma Team</em>
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Karma Platform. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

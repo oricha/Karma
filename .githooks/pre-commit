@@ -1,0 +1,15 @@
+#!/bin/sh
+
+files=$(git diff --cached --name-only --diff-filter=ACM)
+
+[ -z "$files" ] && exit 0
+
+pattern='(password|secret|api[_-]?key|token)[[:space:]]*[:=][[:space:]]*["'\'']?[A-Za-z0-9\/+=._-]{8,}'
+
+if git diff --cached --unified=0 -- $files | grep -E "$pattern" >/dev/null 2>&1; then
+  echo "Commit blocked: possible secret detected in staged changes."
+  echo "Review the diff and move secrets to environment variables or secret managers."
+  exit 1
+fi
+
+exit 0

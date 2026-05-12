@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>We'd Love Your Feedback</title><style>body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; } .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; } .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #007bff; } .event-box { background: #f0f8ff; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0; } .cta-button { display: inline-block; padding: 12px 30px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; } .footer { text-align: center; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }</style></head>
+<body>
+<div class="container">
+    <div class="header"><h1>We'd Love Your Feedback</h1></div>
+    <div class="content">
+        <p>Hello <span th:text="${user.name}">User</span>,</p>
+        <p>Thank you for attending our event! We'd love to hear about your experience:</p>
+        <div class="event-box">
+            <h3 th:text="${event.title}">Event</h3>
+        </div>
+        <p>Please share your review on the platform:</p>
+        <a href="#" class="cta-button">Leave a Review</a>
+        <p>Your feedback helps us improve.</p>
+    </div>
+    <div class="footer"><p>&copy; 2026 Karma Platform</p></div>
+</div>
+</body>
+</html>
