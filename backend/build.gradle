@@ -21,6 +21,7 @@ repositories {
 ext {
     jjwtVersion = '0.12.6'
     awsSdkVersion = '2.30.29'
+    stripeVersion = '31.0.0'
 }
 
 dependencies {
@@ -36,6 +37,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-database-postgresql'
     implementation "software.amazon.awssdk:s3:${awsSdkVersion}"
     implementation 'com.sendgrid:sendgrid-java:4.10.2'
+    implementation "com.stripe:stripe-java:${stripeVersion}"
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     runtimeOnly 'com.h2database:h2'

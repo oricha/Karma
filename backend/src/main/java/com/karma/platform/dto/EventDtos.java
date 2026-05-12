@@ -2,8 +2,11 @@ package com.karma.platform.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public final class EventDtos {
@@ -58,7 +61,42 @@ public final class EventDtos {
             String userId,
             String status,
             Integer waitlistPosition,
-            boolean checkedIn
+            boolean checkedIn,
+            boolean noShow
+    ) {
+    }
+
+    public record UpsertEventRequest(
+            String groupId,
+            @NotBlank @Size(max = 255) String title,
+            @Size(max = 4000) String description,
+            String coverImageUrl,
+            @NotNull LocalDateTime startDate,
+            LocalDateTime endDate,
+            @Size(max = 255) String venueName,
+            @Size(max = 1000) String address,
+            @NotBlank @Size(max = 128) String city,
+            @NotBlank @Size(max = 128) String country,
+            Double latitude,
+            Double longitude,
+            boolean isOnline,
+            boolean isHybrid,
+            String onlineUrl,
+            String status,
+            boolean featured,
+            @Min(1) Integer maxAttendees,
+            boolean isFree,
+            @Min(0) Double price,
+            String currency,
+            @NotBlank @Size(max = 12) String language,
+            @NotBlank String categoryId,
+            List<String> themeIds,
+            Boolean remindersEnabled
+    ) {
+    }
+
+    public record AttendanceUpdateRequest(
+            @NotBlank String userId
     ) {
     }
 

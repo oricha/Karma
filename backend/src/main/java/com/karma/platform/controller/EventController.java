@@ -23,18 +23,27 @@ public class EventController {
     }
 
     @GetMapping
-    public List<EventDtos.EventResponse> list(@RequestParam(required = false) String category, @RequestParam(required = false) String q) {
-        return eventService.list(category, q);
+    public List<EventDtos.EventResponse> list(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String sort
+    ) {
+        return eventService.list(category, q, sort);
     }
 
     @GetMapping("/search")
-    public List<EventDtos.EventResponse> search(@RequestParam(required = false) String q) {
-        return eventService.list(null, q);
+    public List<EventDtos.EventResponse> search(@RequestParam(required = false) String q, @RequestParam(required = false) String sort) {
+        return eventService.list(null, q, sort);
     }
 
     @GetMapping("/nearby")
-    public List<EventDtos.EventResponse> nearby(@RequestParam(required = false) Double lat, @RequestParam(required = false) Double lng, @RequestParam(required = false) Integer radius) {
-        return eventService.nearby(lat, lng, radius);
+    public List<EventDtos.EventResponse> nearby(
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng,
+            @RequestParam(required = false) Integer radius,
+            @RequestParam(required = false, name = "radiusKm") Integer radiusKm
+    ) {
+        return eventService.nearby(lat, lng, radiusKm == null ? radius : radiusKm);
     }
 
     @GetMapping("/popular")
@@ -44,7 +53,7 @@ public class EventController {
 
     @GetMapping("/category/{slug}")
     public List<EventDtos.EventResponse> byCategory(@PathVariable String slug) {
-        return eventService.list(slug, null);
+        return eventService.list(slug, null, null);
     }
 
     @GetMapping("/{slug}")

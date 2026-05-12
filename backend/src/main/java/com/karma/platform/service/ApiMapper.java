@@ -207,7 +207,8 @@ public class ApiMapper {
                 rsvp.getUserId(),
                 rsvp.getStatus().name(),
                 rsvp.getWaitlistPosition(),
-                rsvp.isCheckedIn()
+                rsvp.isCheckedIn(),
+                rsvp.isNoShow()
         );
     }
 
@@ -221,7 +222,26 @@ public class ApiMapper {
                 order.getStatus().name(),
                 order.getTotalAmount(),
                 order.getCurrency(),
-                order.getPurchasedAt().toString()
+                order.getPurchasedAt().toString(),
+                order.getStripeSessionId()
+        );
+    }
+
+    public OrderDtos.TicketTypeResponse toTicketType(TicketTypeEntity ticketType) {
+        return new OrderDtos.TicketTypeResponse(
+                ticketType.getId(),
+                ticketType.getEventId(),
+                ticketType.getName(),
+                ticketType.getDescription(),
+                ticketType.getPrice(),
+                ticketType.getCurrency(),
+                ticketType.getQuantity(),
+                ticketType.getSoldCount(),
+                ticketType.getEarlyBirdPrice(),
+                ticketType.getEarlyBirdQuantity(),
+                ticketType.getEarlyBirdDeadline() == null ? null : ticketType.getEarlyBirdDeadline().toString(),
+                ticketType.getSaleStart() == null ? null : ticketType.getSaleStart().toString(),
+                ticketType.getSaleEnd() == null ? null : ticketType.getSaleEnd().toString()
         );
     }
 
