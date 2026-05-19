@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/lib/auth';
-import type { BlogPost, Category, Event, Group, Order, OrganizerDashboard, RSVP, Review, User } from '@/types';
+import type { BlogPost, Category, Event, Group, GroupPost, Order, OrganizerDashboard, RSVP, Review, User } from '@/types';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '';
 
@@ -130,5 +130,16 @@ export const api = {
 
   getBlogPosts: () => request<BlogPost[]>('/api/blog'),
   getFeaturedBlogPosts: () => request<BlogPost[]>('/api/blog/featured'),
+  getBlogPost: (slug: string) => request<BlogPost>(`/api/blog/${slug}`),
+
+  getGroupPosts: (groupId: string) => request<GroupPost[]>(`/api/groups/${groupId}/posts`),
+  createGroupPost: (groupId: string, payload: { content: string; imageUrl?: string }) =>
+    request<GroupPost>(`/api/groups/${groupId}/posts`, { method: 'POST', body: JSON.stringify(payload) }),
+  replyToGroupPost: (groupId: string, postId: string, payload: { content: string }) =>
+    request<GroupPost>(`/api/groups/${groupId}/posts/${postId}/replies`, { method: 'POST', body: JSON.stringify(payload) }),
+  deleteGroupPost: (groupId: string, postId: string) =>
+    request<void>(`/api/groups/${groupId}/posts/${postId}`, { method: 'DELETE' }),
+  pinGroupPost: (groupId: string, postId: string, pinned: boolean) =>
+    request<GroupPost>(`/api/groups/${groupId}/posts/${postId}/pin?pinned=${pinned}`, { method: 'PUT' }),
   getOrganizerDashboard: () => request<OrganizerDashboard>('/api/organizers/me/dashboard'),
 };

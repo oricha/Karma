@@ -59,17 +59,24 @@ karma:
     cache-size: ${KARMA_GEOCODING_CACHE_SIZE:500}
   email:
     enabled: ${KARMA_EMAIL_ENABLED:false}
+    provider: ${KARMA_EMAIL_PROVIDER:sendgrid}
     from-email: ${KARMA_EMAIL_FROM:noreply@karma.local}
     from-name: ${KARMA_EMAIL_FROM_NAME:Karma}
+    rate-limit-per-day: ${KARMA_EMAIL_RATE_LIMIT_PER_DAY:100}
   notification:
     unsubscribe-base-url: ${KARMA_UNSUBSCRIBE_BASE_URL:https://karma.local}
     hourly-limit: ${KARMA_NOTIFICATION_HOURLY_LIMIT:500}
+    daily-limit: ${KARMA_EMAIL_RATE_LIMIT_PER_DAY:100}
   schedulers:
-    digest-enabled: ${KARMA_SCHEDULER_DIGEST_ENABLED:true}
-    reminder-enabled: ${KARMA_SCHEDULER_REMINDER_ENABLED:true}
+    digest-enabled: ${KARMA_SCHEDULER_DIGEST_ENABLED:false}
+    reminder-enabled: ${KARMA_SCHEDULER_REMINDER_ENABLED:false}
+    review-request-enabled: ${KARMA_SCHEDULER_REVIEW_REQUEST_ENABLED:false}
+    storage-orphan-cleanup-enabled: ${KARMA_SCHEDULER_STORAGE_ORPHAN_CLEANUP_ENABLED:false}
     digest-cron: ${KARMA_SCHEDULER_DIGEST_CRON:0 0 9 * * MON}
     reminder-daily-cron: ${KARMA_SCHEDULER_REMINDER_DAILY_CRON:0 0 0 * * *}
     reminder-hourly-cron: ${KARMA_SCHEDULER_REMINDER_HOURLY_CRON:0 0 * * * *}
+    review-request-cron: ${KARMA_SCHEDULER_REVIEW_REQUEST_CRON:0 30 * * * *}
+    storage-orphan-cleanup-cron: ${KARMA_SCHEDULER_STORAGE_ORPHAN_CLEANUP_CRON:0 0 3 * * *}
   security:
     require-https: ${KARMA_SECURITY_REQUIRE_HTTPS:false}
 

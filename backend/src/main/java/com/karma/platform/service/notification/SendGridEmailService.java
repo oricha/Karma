@@ -16,45 +16,40 @@ import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class SendGridEmailService implements EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(SendGridEmailService.class);
 
     private final SendGrid sendGrid;
-    private final TemplateEngine templateEngine;
-    private final MessageSource messageSource;
+    private final EmailTemplateRenderer templateRenderer;
     private final NotificationEmailProperties emailProperties;
     private final NotificationProperties notificationProperties;
-    private final Map<String, Integer> sentPerHour = new ConcurrentHashMap<>();
+    private final EmailDailyQuotaService dailyQuotaService;
+    private final EmailDeferredQueueService deferredQueueService;
 
     public SendGridEmailService(
             SendGrid sendGrid,
-            TemplateEngine templateEngine,
-            MessageSource messageSource,
+            EmailTemplateRenderer templateRenderer,
             NotificationEmailProperties emailProperties,
-            NotificationProperties notificationProperties
+            NotificationProperties notificationProperties,
+            EmailDailyQuotaService dailyQuotaService,
+            EmailDeferredQueueService deferredQueueService
     ) {
         this.sendGrid = sendGrid;
-        this.templateEngine = templateEngine;
-        this.messageSource = messageSource;
+        this.templateRenderer = templateRenderer;
         this.emailProperties = emailProperties;
         this.notificationProperties = notificationProperties;
+        this.dailyQuotaService = dailyQuotaService;
+        this.deferredQueueService = deferredQueueService;
     }
 
     @Override
     public void sendWelcomeEmail(UserEntity user) {
-        send(user, subject("email.welcome.subject", user), EmailTemplate.WELCOME, Map.of("user", user));
+        send(user, subject("email.welcome.subject", user), EmailTemplate.WELCOME, Map.of("user", user), EmailPriority.TRANSACTIONAL);
     }
 
     @Override
@@ -63,7 +58,7 @@ public class SendGridEmailService implements EmailService {
                 "user", user,
                 "verificationToken", verificationToken,
                 "verificationLink", notificationProperties.getUnsubscribeBaseUrl() + "/verify-email?token=" + verificationToken
-        ));
+        ), EmailPriority.TRANSACTIONAL);
     }
 
     @Override
@@ -72,37 +67,43 @@ public class SendGridEmailService implements EmailService {
                 "user", user,
                 "resetToken", resetToken,
                 "resetLink", notificationProperties.getUnsubscribeBaseUrl() + "/reset-password?token=" + resetToken
-        ));
+        ), EmailPriority.TRANSACTIONAL);
     }
 
     @Override
     public void sendRsvpConfirmationEmail(UserEntity user, EventEntity event) {
-        send(user, subject("email.rsvp-confirmation.subject", user), EmailTemplate.RSVP_CONFIRMATION, Map.of("user", user, "event", event));
+        send(user, subject("email.rsvp-confirmation.subject", user), EmailTemplate.RSVP_CONFIRMATION,
+                Map.of("user", user, "event", event), EmailPriority.TRANSACTIONAL);
     }
 
     @Override
     public void sendWaitlistPromotionEmail(UserEntity user, EventEntity event) {
-        send(user, subject("email.waitlist-promotion.subject", user), EmailTemplate.WAITLIST_PROMOTION, Map.of("user", user, "event", event));
+        send(user, subject("email.waitlist-promotion.subject", user), EmailTemplate.WAITLIST_PROMOTION,
+                Map.of("user", user, "event", event), EmailPriority.TRANSACTIONAL);
     }
 
     @Override
     public void sendOrderConfirmationEmail(UserEntity user, OrderEntity order, EventEntity event) {
-        send(user, subject("email.order-confirmation.subject", user), EmailTemplate.ORDER_CONFIRMATION, Map.of("user", user, "order", order, "event", event));
+        send(user, subject("email.order-confirmation.subject", user), EmailTemplate.ORDER_CONFIRMATION,
+                Map.of("user", user, "order", order, "event", event), EmailPriority.TRANSACTIONAL);
     }
 
     @Override
     public void sendEventCancellationEmail(UserEntity user, EventEntity event) {
-        send(user, subject("email.event-cancellation.subject", user), EmailTemplate.EVENT_CANCELLATION, Map.of("user", user, "event", event));
+        send(user, subject("email.event-cancellation.subject", user), EmailTemplate.EVENT_CANCELLATION,
+                Map.of("user", user, "event", event), EmailPriority.TRANSACTIONAL);
     }
 
     @Override
     public void sendReviewRequestEmail(UserEntity user, EventEntity event) {
-        send(user, subject("email.review-request.subject", user), EmailTemplate.REVIEW_REQUEST, Map.of("user", user, "event", event));
+        send(user, subject("email.review-request.subject", user), EmailTemplate.REVIEW_REQUEST,
+                Map.of("user", user, "event", event), EmailPriority.REMINDER);
     }
 
     @Override
     public void sendNewEventNotificationEmail(UserEntity user, EventEntity event, String groupName) {
-        send(user, subject("email.new-group-event.subject", user), EmailTemplate.NEW_GROUP_EVENT, Map.of("user", user, "event", event, "groupName", groupName));
+        send(user, subject("email.new-group-event.subject", user), EmailTemplate.NEW_GROUP_EVENT,
+                Map.of("user", user, "event", event, "groupName", groupName), EmailPriority.NEWS);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class SendGridEmailService implements EmailService {
                 "user", user,
                 "digest", digestContent,
                 "unsubscribeToken", digestContent.unsubscribeToken()
-        ));
+        ), EmailPriority.DIGEST);
     }
 
     @Override
@@ -120,7 +121,7 @@ public class SendGridEmailService implements EmailService {
                 "user", user,
                 "featuredPosts", featuredPosts,
                 "unsubscribeToken", user.getId()
-        ));
+        ), EmailPriority.NEWS);
     }
 
     @Override
@@ -135,15 +136,25 @@ public class SendGridEmailService implements EmailService {
             case ONE_DAY -> "email.event-reminder-1day.subject";
             case TWO_HOURS -> "email.event-reminder-2hour.subject";
         };
-        send(user, subject(key, user), template, Map.of("user", user, "event", event, "reminderType", reminderType));
+        send(user, subject(key, user), template, Map.of("user", user, "event", event, "reminderType", reminderType),
+                EmailPriority.REMINDER);
     }
 
-    private void send(UserEntity user, String subject, EmailTemplate template, Map<String, Object> variables) {
+    private void send(
+            UserEntity user,
+            String subject,
+            EmailTemplate template,
+            Map<String, Object> variables,
+            EmailPriority priority
+    ) {
         EmailRetryTemplate.executeWithRetry(() -> {
-            checkRateLimit();
-            String body = render(template, locale(user), variables);
+            String body = templateRenderer.render(template, userLocale(user), variables);
+            if (!dailyQuotaService.tryConsume(priority)) {
+                deferredQueueService.enqueue(user.getEmail(), subject, body, priority);
+                log.info("Deferred email {} to {} (priority {})", template.name(), user.getEmail(), priority);
+                return null;
+            }
             sendMail(subject, user.getEmail(), body);
-            recordSend();
             return null;
         }, "send_email:" + template.name());
     }
@@ -162,6 +173,9 @@ public class SendGridEmailService implements EmailService {
             request.setBody(mail.build());
             Response response = sendGrid.api(request);
             if (response.getStatusCode() >= 400) {
+                if (response.getStatusCode() < 500) {
+                    throw new NonRetryableEmailException("SendGrid rejected request with status " + response.getStatusCode());
+                }
                 throw new IllegalStateException("SendGrid rejected request with status " + response.getStatusCode());
             }
         } catch (IOException exception) {
@@ -170,30 +184,10 @@ public class SendGridEmailService implements EmailService {
     }
 
     private String subject(String key, UserEntity user) {
-        return messageSource.getMessage(key, null, key, locale(user));
+        return templateRenderer.subject(key, userLocale(user));
     }
 
-    private Locale locale(UserEntity user) {
-        return "en".equalsIgnoreCase(user.getLocale()) ? Locale.ENGLISH : new Locale("es");
-    }
-
-    private String render(EmailTemplate template, Locale locale, Map<String, Object> variables) {
-        Context context = new Context(locale);
-        context.setVariables(variables);
-        String name = Locale.ENGLISH.getLanguage().equals(locale.getLanguage()) ? template.getTemplatePathEn() : template.getTemplatePathEs();
-        return templateEngine.process(name, context);
-    }
-
-    private void checkRateLimit() {
-        String hourKey = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).toString();
-        int sent = sentPerHour.getOrDefault(hourKey, 0);
-        if (sent >= notificationProperties.getHourlyLimit()) {
-            throw new IllegalStateException("Hourly email limit reached");
-        }
-    }
-
-    private void recordSend() {
-        String hourKey = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).toString();
-        sentPerHour.merge(hourKey, 1, Integer::sum);
+    private static EmailTemplateRenderer.UserLocale userLocale(UserEntity user) {
+        return EmailTemplateRenderer.userLocale(user.getLocale());
     }
 }

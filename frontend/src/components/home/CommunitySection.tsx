@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { blogExcerpt, blogTitle } from '@/lib/blog';
 
 const CommunitySection = () => {
   const { t, i18n } = useTranslation('home');
@@ -18,17 +19,17 @@ const CommunitySection = () => {
                 <div className="aspect-[16/10] overflow-hidden">
                   <img
                     src={post.coverImageUrl}
-                    alt={i18n.language === 'es' ? post.titleEs : post.titleEn}
+                    alt={blogTitle(post, i18n.language)}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
                 </div>
                 <div className="p-4">
                   <h3 className="font-heading text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {i18n.language === 'es' ? post.titleEs : post.titleEn}
+                    {blogTitle(post, i18n.language)}
                   </h3>
                   <p className="font-body text-sm text-muted-foreground line-clamp-2">
-                    {i18n.language === 'es' ? post.excerptEs : post.excerptEn}
+                    {blogExcerpt(post, i18n.language)}
                   </p>
                 </div>
               </div>

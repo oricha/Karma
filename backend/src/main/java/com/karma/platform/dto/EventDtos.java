@@ -44,7 +44,8 @@ public final class EventDtos {
             List<CatalogDtos.ThemeResponse> themes,
             CatalogDtos.CategoryResponse category,
             Double averageRating,
-            Integer reviewCount
+            Integer reviewCount,
+            boolean remindersEnabled
     ) {
     }
 

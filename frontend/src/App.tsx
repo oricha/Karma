@@ -22,6 +22,8 @@ import OrdersPage from "./pages/account/OrdersPage";
 import AccountDetailsPage from "./pages/account/AccountDetailsPage";
 import PreferencesPage from "./pages/account/PreferencesPage";
 import SavedEventsPage from "./pages/account/SavedEventsPage";
+import BlogListPage from "./pages/BlogListPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
 import OrganizerDashboardPage from "./pages/organizer/OrganizerDashboardPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -45,6 +47,8 @@ const App = () => (
                 <Route path="/events/category/:slug" element={<EventListPage />} />
                 <Route path="/groups" element={<GroupListPage />} />
                 <Route path="/groups/:slug" element={<GroupDetailPage />} />
+                <Route path="/blog" element={<BlogListPage />} />
+                <Route path="/blog/:slug" element={<BlogDetailPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />

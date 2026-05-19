@@ -9,7 +9,10 @@ import com.karma.platform.persistence.entity.OrderEntity;
 import com.karma.platform.persistence.repository.EventRepository;
 import com.karma.platform.persistence.repository.OrderItemRepository;
 import com.karma.platform.persistence.repository.OrderRepository;
+import com.karma.platform.persistence.entity.UserEntity;
 import com.karma.platform.persistence.repository.TicketTypeRepository;
+import com.karma.platform.persistence.repository.UserRepository;
+import com.karma.platform.service.notification.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,8 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final TicketTypeRepository ticketTypeRepository;
     private final PaymentService paymentService;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
     private final ApiMapper apiMapper;
 
     public OrderService(
@@ -36,6 +41,8 @@ public class OrderService {
             OrderItemRepository orderItemRepository,
             TicketTypeRepository ticketTypeRepository,
             PaymentService paymentService,
+            UserRepository userRepository,
+            EmailService emailService,
             ApiMapper apiMapper
     ) {
         this.eventRepository = eventRepository;
@@ -43,6 +50,8 @@ public class OrderService {
         this.orderItemRepository = orderItemRepository;
         this.ticketTypeRepository = ticketTypeRepository;
         this.paymentService = paymentService;
+        this.userRepository = userRepository;
+        this.emailService = emailService;
         this.apiMapper = apiMapper;
     }
 
@@ -98,6 +107,11 @@ public class OrderService {
                 });
             }
         });
+        EventEntity event = eventRepository.findById(order.getEventId()).orElse(null);
+        UserEntity user = userRepository.findById(order.getUserId()).orElse(null);
+        if (user != null && event != null) {
+            emailService.sendOrderConfirmationEmail(user, order, event);
+        }
         return apiMapper.toOrder(order);
     }
 

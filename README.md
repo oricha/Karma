@@ -8,6 +8,21 @@ Karma is a wellness and spirituality events platform with:
 
 ## Local development
 
+### Database and MailHog (Phase 5 email testing)
+
+From the repo root:
+
+```bash
+docker compose up -d
+```
+
+- PostgreSQL: `localhost:5432` (db `karma_local`, user/password `postgres`)
+- MailHog UI: http://localhost:8025 (SMTP on `localhost:1025`)
+
+Use `karma.email.provider=mailhog` in `backend/src/main/resources/application-local.yml` and `KARMA_EMAIL_ENABLED=true` to capture outbound mail locally.
+
+### App
+
 1. Start the backend:
 
 ```bash
@@ -44,5 +59,6 @@ The frontend proxies `/api` requests to `http://localhost:8081`.
 - Backend phase 6 introduces OpenAPI at `/swagger-ui.html`, health checks at `/actuator/health`, JaCoCo coverage reports, stricter security headers, JWT audience validation, and a repo-level pre-commit secret scan hook under `.githooks/pre-commit`.
 - `deploy/test/docker-compose.yml` provisions the test stack for Dokploy.
 - `deploy/production/docker-compose.yml` provisions the production stack for AWS EC2.
-- GitHub Actions workflows live in `.github/workflows/` for test Dokploy deployment and production AWS deployment.
+- GitHub Actions: `ci.yml` runs backend tests + JaCoCo coverage on PRs; deploy workflows target Dokploy (test) and AWS (production).
+- Phase 5 adds trilingual email (ES/EN/CA), weekly digests, event reminders, blog, and group discussions. Schedulers default to **off** until enabled via env vars.
 - The implementation plan is tracked in [`.agent/specs/karma-platform/tasks.md`](/Users/zion/dev/project/karma/.agent/specs/karma-platform/tasks.md).

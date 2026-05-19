@@ -68,6 +68,16 @@ class BlogControllerIntegrationTests {
                 .andExpect(jsonPath("$.titleEs").value("Guia de respiracion para eventos conscientes"))
                 .andExpect(jsonPath("$.contentEn").value("Full English content for the guide."));
 
+        mockMvc.perform(put("/api/blog/{id}/publish", postId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.published").value(true));
+
+        mockMvc.perform(put("/api/blog/{id}/unpublish", postId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.published").value(false));
+
         mockMvc.perform(put("/api/blog/{id}", postId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)

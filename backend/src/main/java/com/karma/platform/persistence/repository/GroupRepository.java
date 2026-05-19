@@ -14,4 +14,6 @@ public interface GroupRepository extends JpaRepository<GroupEntity, String> {
     List<GroupEntity> findByOrganizerId(String organizerId);
 
     List<GroupEntity> findByOrganizerIdAndStatus(String organizerId, GroupStatus status);
+
+    boolean existsByBannerUrlContaining(String fragment);
 }

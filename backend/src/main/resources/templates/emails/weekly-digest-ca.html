@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>Tu Resumen Semanal de Karma</title><style>body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; } .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; } .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #007bff; } .section-title { font-size: 18px; font-weight: bold; color: #007bff; margin-top: 20px; margin-bottom: 10px; } .event-item { background: #f0f8ff; padding: 12px; margin: 8px 0; border-radius: 5px; } .unsubscribe { text-align: center; font-size: 12px; color: #999; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; } .footer { text-align: center; padding-top: 10px; font-size: 12px; color: #666; }</style></head>
+<body>
+<div class="container">
+    <div class="header"><h1>Tu Resumen Semanal de Karma</h1></div>
+    <div class="content">
+        <p>Hola <span th:text="${user.name}">Usuario</span>,</p>
+        <p>Aquí están los eventos destacados de esta semana:</p>
+
+        <div class="section-title">Eventos en tus Grupos</div>
+        <div th:each="event : ${digest.groupEvents}" class="event-item">
+            <strong th:text="${event.title}">Evento</strong><br/>
+            <small th:text="${event.startTime}">Fecha</small>
+        </div>
+
+        <div class="section-title">Eventos Recomendados para Ti</div>
+        <div th:each="event : ${digest.recommendedEvents}" class="event-item">
+            <strong th:text="${event.title}">Evento</strong><br/>
+            <small th:text="${event.startTime}">Fecha</small>
+        </div>
+
+        <div class="section-title">Eventos Populares en tu Región</div>
+        <div th:each="event : ${digest.popularRegionalEvents}" class="event-item">
+            <strong th:text="${event.title}">Evento</strong><br/>
+            <small th:text="${event.startTime}">Fecha</small>
+        </div>
+
+        <div class="unsubscribe">
+            <a th:href="'#unsubscribe=' + ${unsubscribeToken}">Cancelar suscripción</a>
+        </div>
+    </div>
+    <div class="footer"><p>&copy; 2026 Karma Platform</p></div>
+</div>
+</body>
+</html>
