@@ -20,6 +20,8 @@ public interface EventRepository extends JpaRepository<EventEntity, String>, Jpa
 
     List<EventEntity> findByOrganizerId(String organizerId);
 
+    boolean existsByCoverImageUrlContaining(String fragment);
+
     @Query(value = """
             select *
             from events e

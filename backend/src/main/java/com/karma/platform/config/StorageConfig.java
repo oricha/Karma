@@ -14,6 +14,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
 
@@ -48,6 +49,21 @@ public class StorageConfig {
             builder.credentialsProvider(DefaultCredentialsProvider.create());
         }
 
-        return new S3FileStorageService(builder.build(), properties);
+        S3Client s3Client = builder.build();
+        S3Presigner.Builder presignerBuilder = S3Presigner.builder()
+                .region(Region.of(properties.region()))
+                .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build());
+        if (properties.endpoint() != null && !properties.endpoint().isBlank()) {
+            presignerBuilder.endpointOverride(URI.create(properties.endpoint()));
+        }
+        if (properties.accessKey() != null && !properties.accessKey().isBlank()
+                && properties.secretKey() != null && !properties.secretKey().isBlank()) {
+            presignerBuilder.credentialsProvider(StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(properties.accessKey(), properties.secretKey())
+            ));
+        } else {
+            presignerBuilder.credentialsProvider(DefaultCredentialsProvider.create());
+        }
+        return new S3FileStorageService(s3Client, presignerBuilder.build(), properties);
     }
 }

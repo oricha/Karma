@@ -179,7 +179,8 @@ public class ApiMapper {
                 themeResponses,
                 category == null ? null : toCategory(category),
                 averageRating == null ? null : Math.round(averageRating * 10.0) / 10.0,
-                Math.toIntExact(reviewCount)
+                Math.toIntExact(reviewCount),
+                event.isRemindersEnabled()
         );
     }
 
@@ -250,11 +251,14 @@ public class ApiMapper {
                 blogPost.getId(),
                 blogPost.getTitleEs(),
                 blogPost.getTitleEn(),
+                blogPost.getTitleCa(),
                 blogPost.getSlug(),
                 blogPost.getExcerptEs(),
                 blogPost.getExcerptEn(),
+                blogPost.getExcerptCa(),
                 blogPost.getContentEs(),
                 blogPost.getContentEn(),
+                blogPost.getContentCa(),
                 blogPost.getCoverImageUrl(),
                 blogPost.isFeatured(),
                 blogPost.isPublished(),

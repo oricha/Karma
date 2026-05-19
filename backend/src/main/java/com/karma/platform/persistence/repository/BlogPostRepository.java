@@ -15,4 +15,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPostEntity, String
     List<BlogPostEntity> findTop3ByPublishedTrueAndFeaturedTrueOrderByPublishedAtDesc();
 
     boolean existsBySlug(String slug);
+
+    boolean existsByCoverImageUrlContaining(String fragment);
 }

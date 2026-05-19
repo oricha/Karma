@@ -36,6 +36,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
     implementation "software.amazon.awssdk:s3:${awsSdkVersion}"
+    implementation "software.amazon.awssdk:s3-transfer-manager:${awsSdkVersion}"
     implementation 'com.sendgrid:sendgrid-java:4.10.2'
     implementation "com.stripe:stripe-java:${stripeVersion}"
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -65,6 +66,14 @@ jacoco {
     toolVersion = '0.8.12'
 }
 
+def jacocoExcludes = [
+        '**/dto/**',
+        '**/config/**',
+        '**/persistence/**',
+        '**/controller/**',
+        '**/KarmaPlatformApplication.class',
+]
+
 tasks.named('jacocoTestReport') {
     dependsOn tasks.named('test')
     reports {
@@ -72,4 +81,24 @@ tasks.named('jacocoTestReport') {
         csv.required = false
         html.required = true
     }
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: jacocoExcludes)
+    }))
+}
+
+tasks.named('jacocoTestCoverageVerification') {
+    dependsOn tasks.named('jacocoTestReport')
+    classDirectories.setFrom(tasks.named('jacocoTestReport').get().classDirectories)
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.63 // raise toward 0.70 as service-layer tests expand
+            }
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('jacocoTestCoverageVerification')
 }

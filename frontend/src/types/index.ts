@@ -127,25 +127,48 @@ export interface Order {
   purchasedAt: string;
 }
 
+export interface GroupPostAuthor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+}
+
+export interface GroupPostReply {
+  id: string;
+  postId: string;
+  author: GroupPostAuthor;
+  content: string;
+  createdAt: string;
+}
+
 export interface GroupPost {
   id: string;
   groupId: string;
-  author: User;
+  author: GroupPostAuthor;
   content: string;
   imageUrl?: string;
-  isPinned: boolean;
+  pinned: boolean;
   createdAt: string;
   replyCount?: number;
+  replies?: GroupPostReply[];
 }
 
 export interface BlogPost {
   id: string;
   titleEs: string;
   titleEn: string;
+  titleCa?: string;
   slug: string;
   excerptEs?: string;
   excerptEn?: string;
+  excerptCa?: string;
+  contentEs?: string;
+  contentEn?: string;
+  contentCa?: string;
   coverImageUrl?: string;
+  featured?: boolean;
+  published?: boolean;
   publishedAt?: string;
 }
 

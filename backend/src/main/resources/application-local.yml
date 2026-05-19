@@ -5,6 +5,20 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
+spring:
+  mail:
+    host: ${KARMA_MAIL_HOST:localhost}
+    port: ${KARMA_MAIL_PORT:1025}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
 karma:
+  email:
+    enabled: ${KARMA_EMAIL_ENABLED:true}
+    provider: ${KARMA_EMAIL_PROVIDER:mailhog}
   jwt:
     secret: ${KARMA_JWT_SECRET:karma-platform-local-dev-secret-key-change-me-please}

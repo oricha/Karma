@@ -1,0 +1,31 @@
+# Local development stack (Postgres + MailHog for Phase 5 email testing)
+name: karma-dev
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: karma-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: karma_local
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - karma_dev_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d karma_local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: karma-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  karma_dev_postgres_data:

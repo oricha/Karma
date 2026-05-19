@@ -7,13 +7,14 @@ import { MapPin, Users, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EventCard from '@/components/events/EventCard';
+import GroupDiscussionPanel from '@/components/groups/GroupDiscussionPanel';
 import { api } from '@/lib/api';
 import { useSession } from '@/hooks/use-session';
 
 const GroupDetailPage = () => {
   const { slug } = useParams();
   const { t, i18n } = useTranslation('groups');
-  const { isLoggedIn } = useSession();
+  const { isLoggedIn, user } = useSession();
   const queryClient = useQueryClient();
   const { data } = useQuery({
     queryKey: ['group', slug],
@@ -78,9 +79,10 @@ const GroupDetailPage = () => {
           </TabsContent>
 
           <TabsContent value="discussion">
-            <div className="bg-card rounded-2xl p-6">
-              <p className="font-body text-muted-foreground">{t('discussion.writePost')}</p>
-            </div>
+            <GroupDiscussionPanel
+              groupId={group.id}
+              isOrganizer={group.organizer?.userId === user?.id}
+            />
           </TabsContent>
 
           <TabsContent value="members">

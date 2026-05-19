@@ -112,7 +112,11 @@ public class UserService {
         current.setPhone(request.phone());
         current.setBio(request.bio());
         if (StringUtils.hasText(request.locale())) {
-            current.setLocale(request.locale());
+            String locale = request.locale().trim().toLowerCase(java.util.Locale.ROOT);
+            if (!java.util.Set.of("es", "en", "ca").contains(locale)) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "error.validation", "Validation error");
+            }
+            current.setLocale(locale);
         }
         return apiMapper.toUser(userRepository.save(current));
     }

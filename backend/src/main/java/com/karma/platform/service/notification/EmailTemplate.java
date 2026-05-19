@@ -33,4 +33,8 @@ public enum EmailTemplate {
     public String getTemplatePathEn() {
         return "emails/" + templateName + "-en";
     }
+
+    public String getTemplatePathCa() {
+        return "emails/" + templateName + "-ca";
+    }
 }

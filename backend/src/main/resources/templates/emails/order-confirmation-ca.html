@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>Orden Confirmada</title><style>body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; } .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; } .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #28a745; } .order-box { background: #f0f8ff; padding: 15px; border: 1px solid #ddd; margin: 20px 0; } .footer { text-align: center; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }</style></head>
+<body>
+<div class="container">
+    <div class="header"><h1>Orden Confirmada</h1></div>
+    <div class="content">
+        <p>Hola <span th:text="${user.name}">Usuario</span>,</p>
+        <p>¡Gracias por tu compra!</p>
+        <div class="order-box">
+            <p><strong>Número de Orden:</strong> <span th:text="${order.orderNumber}">123456</span></p>
+            <p><strong>Total:</strong> <span th:text="${order.total}">$100.00</span></p>
+            <p>Tu e-ticket se adjunta a este email. Guárdalo para el evento.</p>
+        </div>
+        <p>Si tienes preguntas, contacta a nuestro equipo de soporte.</p>
+    </div>
+    <div class="footer"><p>&copy; 2026 Karma Platform</p></div>
+</div>
+</body>
+</html>

@@ -19,6 +19,9 @@ public class EmailRetryTemplate {
             try {
                 log.debug("Attempt {} of {} for operation: {}", attempt, MAX_RETRIES, operationName);
                 return operation.get();
+            } catch (NonRetryableEmailException e) {
+                log.error("Non-retryable failure for operation: {}", operationName, e);
+                throw e;
             } catch (Exception e) {
                 if (attempt == MAX_RETRIES) {
                     log.error("Failed to execute {} after {} retries", operationName, MAX_RETRIES, e);
@@ -35,7 +38,7 @@ public class EmailRetryTemplate {
                     throw new RuntimeException("Retry interrupted", ie);
                 }
 
-                delay = (long) (delay * 1.5);
+                delay = delay * 2;
                 attempt++;
             }
         }

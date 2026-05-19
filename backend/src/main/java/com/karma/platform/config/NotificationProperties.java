@@ -7,6 +7,7 @@ public class NotificationProperties {
 
     private String unsubscribeBaseUrl = "https://karma.local";
     private int hourlyLimit = 500;
+    private int dailyLimit = 100;
 
     public String getUnsubscribeBaseUrl() {
         return unsubscribeBaseUrl;
@@ -22,5 +23,13 @@ public class NotificationProperties {
 
     public void setHourlyLimit(int hourlyLimit) {
         this.hourlyLimit = hourlyLimit;
+    }
+
+    public int getDailyLimit() {
+        return dailyLimit;
+    }
+
+    public void setDailyLimit(int dailyLimit) {
+        this.dailyLimit = dailyLimit;
     }
 }

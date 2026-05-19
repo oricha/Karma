@@ -44,6 +44,16 @@ public class BlogController {
         return blogService.update(currentUser.id(), id, request);
     }
 
+    @PutMapping("/{id}/publish")
+    public BlogDtos.BlogPostResponse publish(@PathVariable String id) {
+        return blogService.publishPost(currentUser.id(), id);
+    }
+
+    @PutMapping("/{id}/unpublish")
+    public BlogDtos.BlogPostResponse unpublish(@PathVariable String id) {
+        return blogService.unpublishPost(currentUser.id(), id);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
         blogService.delete(currentUser.id(), id);

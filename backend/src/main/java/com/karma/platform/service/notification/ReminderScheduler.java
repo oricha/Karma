@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "karma.schedulers.reminder-enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "karma.schedulers.reminder-enabled", havingValue = "true")
 public class ReminderScheduler {
 
     private final PersistentReminderService reminderService;

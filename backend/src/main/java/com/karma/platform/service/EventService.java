@@ -15,6 +15,8 @@ import com.karma.platform.persistence.repository.EventThemeRepository;
 import com.karma.platform.persistence.repository.OrganizerProfileRepository;
 import com.karma.platform.persistence.repository.RsvpRepository;
 import com.karma.platform.persistence.repository.ReviewRepository;
+import com.karma.platform.persistence.repository.UserRepository;
+import com.karma.platform.service.notification.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -42,6 +44,8 @@ public class EventService {
     private final OrganizerProfileRepository organizerProfileRepository;
     private final DomainGeocodingService domainGeocodingService;
     private final WaitlistService waitlistService;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
     private final ApiMapper apiMapper;
 
     public EventService(
@@ -53,6 +57,8 @@ public class EventService {
             OrganizerProfileRepository organizerProfileRepository,
             DomainGeocodingService domainGeocodingService,
             WaitlistService waitlistService,
+            UserRepository userRepository,
+            EmailService emailService,
             ApiMapper apiMapper
     ) {
         this.eventRepository = eventRepository;
@@ -63,6 +69,8 @@ public class EventService {
         this.organizerProfileRepository = organizerProfileRepository;
         this.domainGeocodingService = domainGeocodingService;
         this.waitlistService = waitlistService;
+        this.userRepository = userRepository;
+        this.emailService = emailService;
         this.apiMapper = apiMapper;
     }
 
@@ -152,6 +160,12 @@ public class EventService {
         EventEntity event = requireManagedEvent(userId, eventId);
         event.setStatus(EventStatus.CANCELLED);
         eventRepository.save(event);
+        rsvpRepository.findByEventId(eventId).stream()
+                .filter(rsvp -> rsvp.getStatus() == RsvpStatus.YES)
+                .map(RsvpEntity::getUserId)
+                .distinct()
+                .forEach(attendeeId -> userRepository.findById(attendeeId).ifPresent(user ->
+                        emailService.sendEventCancellationEmail(user, event)));
     }
 
     public EventDtos.EventDetailResponse detail(String slug) {
@@ -194,7 +208,11 @@ public class EventService {
         rsvp.setCheckedIn(false);
         rsvp.setNoShow(false);
         rsvp.setUpdatedAt(LocalDateTime.now());
-        return apiMapper.toRsvp(rsvpRepository.save(rsvp));
+        RsvpEntity saved = rsvpRepository.save(rsvp);
+        if (status == RsvpStatus.YES) {
+            userRepository.findById(userId).ifPresent(user -> emailService.sendRsvpConfirmationEmail(user, event));
+        }
+        return apiMapper.toRsvp(saved);
     }
 
     @Transactional
@@ -209,7 +227,12 @@ public class EventService {
             rsvp.setUpdatedAt(LocalDateTime.now());
             rsvpRepository.save(rsvp);
             if (wasConfirmed) {
-                waitlistService.promoteFromWaitlist(eventId);
+                RsvpEntity promoted = waitlistService.promoteFromWaitlist(eventId);
+                if (promoted != null) {
+                    eventRepository.findById(eventId).ifPresent(event ->
+                            userRepository.findById(promoted.getUserId()).ifPresent(user ->
+                                    emailService.sendWaitlistPromotionEmail(user, event)));
+                }
             } else if (wasWaitlisted) {
                 waitlistService.reorderWaitlist(eventId);
             }

@@ -10,4 +10,6 @@ public interface GroupPostRepository extends JpaRepository<GroupPostEntity, Stri
     List<GroupPostEntity> findByGroupIdOrderByPinnedDescCreatedAtDesc(String groupId);
 
     long countByGroupIdAndPinnedTrue(String groupId);
+
+    boolean existsByImageUrlContaining(String fragment);
 }

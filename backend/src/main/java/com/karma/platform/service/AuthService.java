@@ -7,6 +7,7 @@ import com.karma.platform.model.NewsletterFrequency;
 import com.karma.platform.model.UserRole;
 import com.karma.platform.persistence.entity.*;
 import com.karma.platform.persistence.repository.*;
+import com.karma.platform.service.notification.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final ApiMapper apiMapper;
+    private final EmailService emailService;
     private final long refreshTokenDays;
 
     public AuthService(
@@ -41,6 +43,7 @@ public class AuthService {
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             ApiMapper apiMapper,
+            EmailService emailService,
             @Value("${karma.jwt.refresh-token-days}") long refreshTokenDays
     ) {
         this.userRepository = userRepository;
@@ -52,6 +55,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.apiMapper = apiMapper;
+        this.emailService = emailService;
         this.refreshTokenDays = refreshTokenDays;
     }
 
@@ -84,6 +88,8 @@ public class AuthService {
         replaceThemePreferences(user.getId(), List.of("theme-yoga", "theme-ecstatic"));
 
         String emailVerificationToken = createEmailVerificationToken(user.getId());
+        emailService.sendWelcomeEmail(user);
+        emailService.sendEmailVerificationEmail(user, emailVerificationToken);
         return tokensFor(user, emailVerificationToken);
     }
 
@@ -109,7 +115,11 @@ public class AuthService {
     @Transactional
     public AuthDtos.ActionResponse forgotPassword(AuthDtos.ForgotPasswordRequest request) {
         return userRepository.findByEmailIgnoreCase(request.email())
-                .map(user -> new AuthDtos.ActionResponse("Password reset token created", createPasswordResetToken(user.getId())))
+                .map(user -> {
+                    String resetToken = createPasswordResetToken(user.getId());
+                    emailService.sendPasswordResetEmail(user, resetToken);
+                    return new AuthDtos.ActionResponse("If the account exists, a password reset email has been queued", null);
+                })
                 .orElse(new AuthDtos.ActionResponse("If the account exists, a password reset email has been queued", null));
     }
 

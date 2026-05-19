@@ -2,6 +2,9 @@ package com.karma.platform;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.karma.platform.persistence.entity.UserEntity;
+import com.karma.platform.persistence.repository.PasswordResetTokenRepository;
+import com.karma.platform.persistence.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,6 +27,12 @@ class AuthControllerIntegrationTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Test
     void loginReturnsTokensForDemoUser() throws Exception {
@@ -68,7 +77,7 @@ class AuthControllerIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user.emailVerified").value(true));
 
-        String forgotResponse = mockMvc.perform(post("/api/auth/forgot-password")
+        mockMvc.perform(post("/api/auth/forgot-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -76,12 +85,15 @@ class AuthControllerIntegrationTests {
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").isString())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andExpect(jsonPath("$.message").value("If the account exists, a password reset email has been queued"));
 
-        String resetToken = objectMapper.readTree(forgotResponse).get("token").asText();
+        UserEntity registeredUser = userRepository.findByEmailIgnoreCase("new.user@karma.app").orElseThrow();
+        String resetToken = passwordResetTokenRepository.findAll().stream()
+                .filter(token -> registeredUser.getId().equals(token.getUserId()) && token.getUsedAt() == null)
+                .map(token -> token.getToken())
+                .findFirst()
+                .orElseThrow();
+        assertThat(resetToken).isNotBlank();
 
         mockMvc.perform(post("/api/auth/reset-password")
                         .contentType(MediaType.APPLICATION_JSON)

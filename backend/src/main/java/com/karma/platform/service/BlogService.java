@@ -70,6 +70,27 @@ public class BlogService {
     }
 
     @Transactional
+    public BlogDtos.BlogPostResponse publishPost(String userId, String postId) {
+        requireAdmin(userId);
+        BlogPostEntity post = blogPostRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.blog-post-not-found", "Blog post not found"));
+        post.setPublished(true);
+        if (post.getPublishedAt() == null) {
+            post.setPublishedAt(LocalDate.now());
+        }
+        return apiMapper.toBlogPost(blogPostRepository.save(post));
+    }
+
+    @Transactional
+    public BlogDtos.BlogPostResponse unpublishPost(String userId, String postId) {
+        requireAdmin(userId);
+        BlogPostEntity post = blogPostRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "error.blog-post-not-found", "Blog post not found"));
+        post.setPublished(false);
+        return apiMapper.toBlogPost(blogPostRepository.save(post));
+    }
+
+    @Transactional
     public void delete(String userId, String postId) {
         requireAdmin(userId);
         BlogPostEntity post = blogPostRepository.findById(postId)
@@ -84,10 +105,13 @@ public class BlogService {
         }
         post.setTitleEs(request.titleEs().trim());
         post.setTitleEn(request.titleEn().trim());
+        post.setTitleCa(StringUtils.hasText(request.titleCa()) ? request.titleCa().trim() : request.titleEs().trim());
         post.setExcerptEs(request.excerptEs().trim());
         post.setExcerptEn(request.excerptEn().trim());
+        post.setExcerptCa(StringUtils.hasText(request.excerptCa()) ? request.excerptCa().trim() : request.excerptEs().trim());
         post.setContentEs(request.contentEs().trim());
         post.setContentEn(request.contentEn().trim());
+        post.setContentCa(StringUtils.hasText(request.contentCa()) ? request.contentCa().trim() : request.contentEs().trim());
         post.setCoverImageUrl(request.coverImageUrl());
         post.setFeatured(request.featured());
         post.setPublished(request.published());
