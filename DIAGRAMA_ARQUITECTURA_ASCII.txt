@@ -1,0 +1,305 @@
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                        🌍 KARMA PLATFORM - ARQUITECTURA GLOBAL CON EXPANSIÓN MUNDIAL 🌍                                              ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       🟢 COMPONENTES ACTUALES (En Verde)                                                            │
+│                                       🔵 COMPONENTES PARA EXPANSIÓN (En Azul)                                                       │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+                                          ╔═════════════════════════════════════════╗
+                                          ║        🌐 CLIENTES GLOBALES           ║
+                                          ║   Web (React) | iOS (Swift) | Android  ║
+                                          ╚═════════════════════════════════════════╝
+                                                         │
+                                                         │
+                    ╔────────────────────────────────────┼────────────────────────────────╗
+                    │                                    │                                │
+                    ▼                                    ▼                                ▼
+        ┌──────────────────────┐          ┌──────────────────────┐          ┌──────────────────────┐
+        │ 🔵 CDN GLOBAL        │          │ 🟢 API GATEWAY      │          │ 🔵 LOAD BALANCER     │
+        │ - Cloudflare/CloudFront         │ - Kong/Nginx         │          │ - AWS ALB / HAProxy  │
+        │ - Asset distribution│           │ - Rate limiting      │          │ - Geo-routing        │
+        │ - DDoS protection   │           │ - Authentication     │          │ - Health checks      │
+        └──────────────────────┘          │ - Request transform  │          └──────────────────────┘
+                    │                     │ - Logging            │                    │
+                    └─────────────────────┼──────────────────────┴────────────────────┘
+                                          │
+                    ╔─────────────────────┴──────────────────────────╗
+                    │                                                │
+                    ▼                                                ▼
+        ┌──────────────────────────────────┐        ┌──────────────────────────────────┐
+        │     🟢 BACKEND (Spring Boot)    │        │ 🔵 OBSERVABILIDAD & MONITORING   │
+        │ ────────────────────────────    │        │ ──────────────────────────────   │
+        │ • Auth Service         (JWT)    │        │ • Prometheus + Grafana            │
+        │ • Event Management              │        │ • ELK Stack (Logging)             │
+        │ • User Profiles                 │        │ • APM (New Relic/DataDog)         │
+        │ • Order Processing              │        │ • Alert Management                │
+        │ • Payment Handler               │        │ • Health Checks                   │
+        │ • Notifications                 │        │                                   │
+        │ • Blog & Content                │        │ 🔵 ANÁLITICA                      │
+        │ • Groups & Discussions          │        │ • Google Analytics                │
+        │ • Organizer API                 │        │ • Segment / Mixpanel              │
+        │                                 │        │ • Custom Events Tracking          │
+        │ 🔵 INTL & LOCALIZATION        │        │                                   │
+        │ • i18n Middleware               │        │ 🔵 REAL-TIME                     │
+        │ • Multi-currency                │        │ • WebSockets (Socket.io)          │
+        │ • Timezone handling             │        │ • Pub/Sub notifications           │
+        │ • Local payment methods         │        │ • Live chat engine                │
+        │                                 │        │ • Presence tracking               │
+        └────────┬─────────────────────────┘        └──────────────────────────────────┘
+                 │
+    ╔────────────┼────────────┐
+    │            │            │
+    ▼            ▼            ▼
+┌──────────┐ ┌──────────┐ ┌──────────┐
+│🟢DATABASE│ │🟢STORAGE │ │🔵 CACHE  │
+│PostgreSQL│ │  S3/     │ │  Redis   │
+│+ PostGIS │ │ Minio    │ │          │
+│          │ │          │ │Session   │
+│• Users   │ │• Images  │ │Cache     │
+│• Events  │ │• Files   │ │Query     │
+│• Orders  │ │• Uploads │ │Cache     │
+│• Payments│ │          │ │Rate Limit│
+│• Reviews │ │🔵 Presign│ │Job Queue │
+│• Tickets │ │  URLs    │ │Pub/Sub   │
+│• Blogs   │ │• Cleanup │ │          │
+│• Discuss │ │• Expiry  │ │          │
+└──────────┘ └──────────┘ └──────────┘
+     │            │            │
+     └────────────┴────────────┘
+              │
+              ▼
+     ┌─────────────────────┐
+     │ 🔵 DATA WAREHOUSE   │
+     │ • Snowflake/BigQuery│
+     │ • Event streaming   │
+     │ • Analytics DB      │
+     │ • Historical data   │
+     │ • ML feature store  │
+     └─────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                              🔄 INTEGRACIONES & SERVICIOS EXTERNOS                                                               │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                                                  │
+│  🟢 ACTUALES:                                 │  🔵 EXPANSIÓN:                                                                 │
+│  • Stripe Payments                            │  • PayPal / Square / Adyen                                                    │
+│  • AWS Services                               │  • Local Payment Methods (iDEAL, Alipay, WeChat, etc)                       │
+│  • Mailhog (Local Email Testing)              │  • Twilio (SMS/WhatsApp)                                                    │
+│  • Google Maps (Implicit)                     │  • Firebase Cloud Messaging (Push)                                          │
+│                                               │  • Google Maps API (Explicit)                                                │
+│                                               │  • Social Login (Google, Facebook, Apple)                                    │
+│                                               │  • CRM Integration (HubSpot, Salesforce)                                    │
+│                                               │  • Video Streaming (Mux, Cloudflare Stream)                                 │
+│                                               │  • Machine Learning (Recommendation Engine)                                 │
+│                                               │  • Blockchain Services (Web3/NFT)                                           │
+│                                                                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                            📚 FLUJO DE DATOS Y COMPONENTES DETALLADOS                                                            │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                                                  │
+│  USER FLOWS:                                                                                                                   │
+│  ═══════════                                                                                                                   │
+│                                                                                                                                  │
+│  1️⃣ SIGN UP / LOGIN                     │ 2️⃣ CREATE / BROWSE EVENTS                                                         │
+│     ┌──────────────────────┐             │    ┌──────────────────────┐                                                        │
+│     │ Frontend UI          │             │    │ Frontend UI          │                                                        │
+│     │ (Auth Component)     │             │    │ (Event Discovery)    │                                                        │
+│     └──────────┬───────────┘             │    └──────────┬───────────┘                                                        │
+│              │                           │             │                                                                      │
+│     🔵 OAuth / Social Login              │    🔵 Geolocation Lookup                                                          │
+│              │                           │             │                                                                      │
+│              ▼                           │             ▼                                                                      │
+│     Backend Auth Service                │    Backend Event Service                                                           │
+│     (JWT + 2FA support)                 │    • Search (Elasticsearch)                                                        │
+│              │                           │    • Filter by category                                                           │
+│              │                           │    • 🔵 Multi-language                                                           │
+│              │                           │    • 🔵 Multi-currency pricing                                                   │
+│              │                           │                                                                                   │
+│     🔵 Email Verification                │    🔵 Redis Cache Hit                                                             │
+│     (i18n Template)                      │    (Reduce DB load)                                                               │
+│              │                           │                                                                                   │
+│              ▼                           │             ▼                                                                      │
+│     PostgreSQL (User Store)              │    PostgreSQL (Event DB)                                                          │
+│              │                           │             │                                                                      │
+│              └─────────────┬──────────────┴─────────────┘                                                                    │
+│                            │                                                                                                  │
+│  3️⃣ BUY TICKETS / CREATE ORDER         │ 4️⃣ PAYMENT PROCESSING                                                             │
+│     ┌──────────────────────┐             │    ┌──────────────────────┐                                                        │
+│     │ Order Summary        │             │    │ Payment Component    │                                                        │
+│     │ (Cart)               │             │    │                      │                                                        │
+│     └──────────┬───────────┘             │    └──────────┬───────────┘                                                        │
+│              │                           │             │                                                                      │
+│     🔵 Multi-currency Total              │    🔵 Multiple Gateways                                                           │
+│     🔵 Local tax calculation             │    (Stripe, PayPal, Square, etc)                                                 │
+│              │                           │             │                                                                      │
+│              ▼                           │             ▼                                                                      │
+│     Backend Order Service                │    Payment Processor                                                              │
+│     • Inventory check                    │    • 3D Secure / SCA                                                              │
+│     • Allocation                         │    • Tokenization                                                                │
+│              │                           │    • Fraud detection                                                              │
+│              │                           │                                                                                   │
+│     🔵 Queue for webhook                 │    🔵 Webhook processing                                                         │
+│     notification                          │    (Async, idempotent)                                                           │
+│              │                           │                                                                                   │
+│              ▼                           │             ▼                                                                      │
+│     PostgreSQL (Orders)                  │    Update Order Status                                                            │
+│              │                           │             │                                                                      │
+│              └─────────────┬──────────────┴─────────────┘                                                                    │
+│                            │                                                                                                  │
+│  5️⃣ NOTIFICATIONS & ENGAGEMENT          │ 6️⃣ ANALYTICS & INSIGHTS                                                          │
+│     ┌──────────────────────┐             │    ┌──────────────────────┐                                                        │
+│     │ Notification Queue   │             │    │ Analytics Pipeline   │                                                        │
+│     │ (Redis)              │             │    │                      │                                                        │
+│     └──────────┬───────────┘             │    └──────────┬───────────┘                                                        │
+│              │                           │             │                                                                      │
+│     🟢 Email Service                     │    🔵 Data Pipeline                                                               │
+│     (Trilingual: ES/EN/CA)              │    (Streaming to warehouse)                                                        │
+│              │                           │                                                                                   │
+│     🔵 SMS/WhatsApp Service             │    🔵 BI Tools                                                                     │
+│     🔵 Push Notifications               │    (Tableau, Looker, etc)                                                          │
+│     🔵 WebSocket Live Events            │                                                                                   │
+│              │                           │    🔵 ML Models                                                                   │
+│              ▼                           │    (Recommendations, Churn prediction)                                            │
+│     External Services                   │             │                                                                      │
+│     • SendGrid                          │             ▼                                                                      │
+│     • Firebase FCM                      │    Data Warehouse                                                                 │
+│     • Twilio                            │    (Snowflake/BigQuery)                                                            │
+│     • Mailgun                           │                                                                                   │
+│              │                           │                                                                                   │
+│              ▼                           │             ▼                                                                      │
+│     🔵 WebSocket Server                 │    Executive Dashboards                                                            │
+│     (Real-time delivery)                │    & Reports                                                                       │
+│                                         │                                                                                   │
+│                                         │    🔵 Recommendation Engine                                                        │
+│                                         │    Personalized event suggestions                                                 │
+│                                                                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                           🏗️ INFRAESTRUCTURA & DEPLOYMENT ACTUAL vs FUTURO                                                      │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                                                  │
+│  🟢 ACTUAL (FASE 0):                    │  🔵 FUTURO (FASES 1-6):                                                            │
+│  ═════════════════════                  │  ════════════════════════                                                           │
+│                                         │                                                                                   │
+│  ┌─────────────────────┐                │  ┌──────────────────────────────────────┐                                          │
+│  │ Docker Compose      │                │  │ Kubernetes Multi-Región               │                                          │
+│  │ (Local Dev)         │                │  │ ┌─ US-East (Primary)                │                                          │
+│  └─────────────────────┘                │  │ ├─ EU-West (GDPR)                   │                                          │
+│                 │                       │  │ ├─ APAC (Tokyo/Singapore)           │                                          │
+│                 ▼                       │  │ ├─ LATAM (São Paulo)                │                                          │
+│  ┌─────────────────────┐                │  │ └─ UAE (Middle East)                │                                          │
+│  │ Dokploy (Testing)   │                │  └──────────────────────────────────────┘                                          │
+│  │ - Test deployments  │                │           │                                                                        │
+│  │ - Staging stack     │                │           ▼                                                                        │
+│  └─────────────────────┘                │  ┌──────────────────────────────────────┐                                          │
+│           │                             │  │ Terraform (Infrastructure as Code)    │                                          │
+│           ▼                             │  │ • VPC/Networking                     │                                          │
+│  ┌─────────────────────┐                │  │ • Database setup                     │                                          │
+│  │ AWS EC2 (Prod)      │                │  │ • Load Balancers                     │                                          │
+│  │ - Single region     │                │  │ • Auto-scaling groups                │                                          │
+│  │ - Manual scaling    │                │  │ • Security groups/ACLs               │                                          │
+│  │ - HA setup          │                │  │ • Monitoring setup                   │                                          │
+│  └─────────────────────┘                │  │ • CI/CD pipelines                    │                                          │
+│                                         │  └──────────────────────────────────────┘                                          │
+│  CI/CD: GitHub Actions                 │                  │                                                                  │
+│  • Run tests                            │                  ▼                                                                  │
+│  • Build Docker image                  │  ┌──────────────────────────────────────┐                                          │
+│  • Push to registry                    │  │ Blue-Green & Canary Deployments      │                                          │
+│  • Deploy to Dokploy/EC2               │  │ • Zero-downtime updates              │                                          │
+│                                         │  │ • Feature flags                      │                                          │
+│  Monitoring:                            │  │ • Gradual rollouts                   │                                          │
+│  • CloudWatch logs                      │  │ • Quick rollback capability          │                                          │
+│  • Basic health checks                 │  └──────────────────────────────────────┘                                          │
+│  • Manual alerts                        │                                                                                   │
+│                                         │  🔵 OBSERVABILITY:                                                                │
+│                                         │  ┌──────────────────────────────────────┐                                          │
+│                                         │  │ Prometheus + Grafana                 │                                          │
+│                                         │  │ • Metrics collection                 │                                          │
+│                                         │  │ • Custom dashboards                  │                                          │
+│                                         │  │ • Alerting rules                     │                                          │
+│                                         │  ├──────────────────────────────────────┤                                          │
+│                                         │  │ ELK Stack (Logging)                  │                                          │
+│                                         │  │ • Centralized logs                   │                                          │
+│                                         │  │ • Full-text search                   │                                          │
+│                                         │  │ • Log analysis & trends              │                                          │
+│                                         │  ├──────────────────────────────────────┤                                          │
+│                                         │  │ APM (New Relic / DataDog)            │                                          │
+│                                         │  │ • Application performance tracking   │                                          │
+│                                         │  │ • Distributed tracing                │                                          │
+│                                         │  │ • Error tracking & debugging         │                                          │
+│                                         │  └──────────────────────────────────────┘                                          │
+│                                                                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                              ⏱️ TIMELINE RECOMENDADO (26 MESES)                                                  ║
+╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                                                                    ║
+║  FASE 0 - FOUNDATION (Meses 1-2)              FASE 1 - GLOBALIZATION (Meses 3-6)                                               ║
+║  ├─ Redis Deployment                         ├─ i18n Implementation                                                            ║
+║  ├─ Prometheus/Grafana                       ├─ Multi-currency Support                                                         ║
+║  ├─ Kong API Gateway                         ├─ Regional Pricing                                                               ║
+║  ├─ Terraform IaC                            └─ Local Payment Methods                                                          ║
+║  └─ CI/CD Enhancement                                                                                                         ║
+║                                              FASE 2 - SCALING (Meses 7-10)                                                      ║
+║  RESULTADO:                                  ├─ CDN Global                                                                       ║
+║  ✅ Infraestructura moderna                   ├─ Load Balancer                                                                 ║
+║  ✅ Observabilidad base                       ├─ DB Read Replicas                                                              ║
+║  ✅ API governance                            ├─ ELK Stack                                                                      ║
+║  ✅ 5x escalabilidad inicial                  └─ APM Implementation                                                             ║
+║                                                                                                                                  ║
+║  FASE 3 - ENGAGEMENT (Meses 11-14)           FASE 4 - MONETIZATION (Meses 15-20)                                              ║
+║  ├─ WebSockets Real-time                     ├─ Multi-Gateway Payments                                                         ║
+║  ├─ Push Notifications                       ├─ Subscription Billing                                                           ║
+║  ├─ SMS/WhatsApp Integration                 ├─ Revenue Analytics                                                              ║
+║  ├─ Live Chat                                ├─ Fraud Detection                                                                 ║
+║  └─ Notification Center                      └─ Marketplace Integration                                                        ║
+║                                                                                                                                  ║
+║  FASE 5 - DATA & ANALYTICS (Meses 21-26)     FASE 6 - INNOVATION (Meses 27+)                                                  ║
+║  ├─ Data Warehouse (Snowflake/BigQuery)      ├─ Machine Learning                                                               ║
+║  ├─ BI Tools Implementation                  ├─ Video Streaming                                                                ║
+║  ├─ Custom Analytics                         ├─ Blockchain/NFT                                                                 ║
+║  └─ ML/Predictions (Phase 1)                 ├─ Advanced CRM                                                                   ║
+║                                              └─ Marketplace Platform                                                           ║
+║                                                                                                                                    ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                    📊 ESTIMACIÓN DE IMPACTO ESPERADO AL FINAL                                                   ║
+╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                                                                    ║
+║  MÉTRICA                          │ ACTUAL      │ DESPUÉS DE EXPANSION    │ MEJORA                                               ║
+║  ──────────────────────────────────┼─────────────┼──────────────────────────┼──────────────────────                             ║
+║  Usuarios Activos (DAU)            │ 5,000       │ 250,000+                 │ 50x ⬆️                                            ║
+║  Países Soportados                 │ 1           │ 150+                     │ 150x ⬆️                                           ║
+║  Idiomas Soportados                │ 3           │ 15+                      │ 5x ⬆️                                             ║
+║  Monedas Soportadas                │ 1           │ 50+                      │ 50x ⬆️                                            ║
+║  Latencia Global (P95)             │ 800ms       │ <200ms                   │ 75% ⬇️                                            ║
+║  Uptime SLA                        │ 99.9%       │ 99.99%                   │ 10x mejor                                        ║
+║  Requests por segundo              │ 1,000       │ 10,000+                  │ 10x ⬆️                                            ║
+║  Revenue per User                  │ $10         │ $25+                     │ 2.5x ⬆️                                          ║
+║  Payment Success Rate              │ 98%         │ 99.5%                    │ 1.5x ⬆️                                          ║
+║  Geographic Diversification        │ 10%         │ 50%+                     │ 5x ⬆️                                             ║
+║  Daily Messages (Real-time)        │ 0           │ 100,000+                 │ ∞ (nuevo)                                        ║
+║  Push Notification Open Rate       │ 0%          │ 25%+                     │ ∞ (nuevo)                                        ║
+║                                                                                                                                    ║
+║  💰 INVERSIÓN ESTIMADA: $1.2M - $2.1M en 26 meses                                                                               ║
+║  📈 ROI ESPERADO: 3-5x en Year 2, 10-15x en Year 3                                                                              ║
+║  ⏱️  TIEMPO DE MERCADO: 6-9 meses para ir a 50+ países                                                                          ║
+║                                                                                                                                    ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+Documentación generada: 20 de Mayo, 2026
+Proyecto: Karma Platform - Global Events & Wellness Platform
+Contacto: Architecture Team

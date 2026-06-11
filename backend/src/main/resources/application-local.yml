@@ -4,8 +4,6 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
-
-spring:
   mail:
     host: ${KARMA_MAIL_HOST:localhost}
     port: ${KARMA_MAIL_PORT:1025}
