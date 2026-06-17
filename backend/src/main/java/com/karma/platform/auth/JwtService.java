@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -29,7 +31,7 @@ public class JwtService {
             @Value("${karma.jwt.access-token-minutes}") long accessMinutes,
             @Value("${karma.jwt.refresh-token-days}") long refreshDays
     ) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.secretKey = buildSecretKey(secret);
         this.issuer = issuer;
         this.audience = audience;
         this.accessMinutes = accessMinutes;
@@ -70,5 +72,20 @@ public class JwtService {
                 .expiration(Date.from(expiresAt))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    private static SecretKey buildSecretKey(String secret) {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalArgumentException("karma.jwt.secret must not be blank");
+        }
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 32) {
+            try {
+                keyBytes = MessageDigest.getInstance("SHA-256").digest(keyBytes);
+            } catch (NoSuchAlgorithmException exception) {
+                throw new IllegalStateException("SHA-256 not available", exception);
+            }
+        }
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

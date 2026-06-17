@@ -15,6 +15,13 @@ npm run test
 
 - `VITE_API_URL` (optional): overrides the backend base URL.
 - By default, development uses the Vite proxy and forwards `/api` to `http://localhost:8081`.
+- In Dokploy test, `VITE_API_URL` is passed at Docker build time with the public test backend URL.
+- In Vercel production, set `VITE_API_URL` as a project environment variable pointing to the Railway backend URL.
+
+## Deployment
+
+- `Dockerfile` builds the frontend for the Dokploy test environment and serves it with nginx.
+- `vercel.json` rewrites all routes to `index.html` so React Router works on Vercel.
 
 ## Current integration status
 

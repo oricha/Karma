@@ -8,18 +8,19 @@ Karma is a wellness and spirituality events platform with:
 
 ## Local development
 
-### Database and MailHog (Phase 5 email testing)
+### Database
 
-From the repo root:
+Local development uses a native PostgreSQL 16 + PostGIS install on `localhost:5432`.
 
 ```bash
-docker compose up -d
+brew install postgresql@16 postgis
+brew services start postgresql@16
+psql postgres -c "CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD 'postgres';" 2>/dev/null || true
+psql postgres -c "CREATE DATABASE karma_local OWNER postgres;"
+psql -d karma_local -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 ```
 
-- PostgreSQL: `localhost:5433` (db `karma_local`, user/password `postgres`; port 5433 avoids conflict with a local Postgres on 5432)
-- MailHog UI: http://localhost:8025 (SMTP on `localhost:1025`)
-
-Use `karma.email.provider=mailhog` in `backend/src/main/resources/application-local.yml` and `KARMA_EMAIL_ENABLED=true` to capture outbound mail locally.
+The root `docker-compose.yml` is kept only as an optional helper for developers who still want Docker PostgreSQL/MailHog locally. Email is disabled by default in the `local` profile; set `KARMA_EMAIL_ENABLED=true` and run MailHog if you need to inspect local email.
 
 ### App
 
@@ -27,10 +28,11 @@ Use `karma.email.provider=mailhog` in `backend/src/main/resources/application-lo
 
 ```bash
 cd backend
-export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/karma_local
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/karma_local
 export SPRING_DATASOURCE_USERNAME=postgres
 export SPRING_DATASOURCE_PASSWORD=postgres
 export KARMA_JWT_SECRET=replace-with-a-long-random-secret
+export KARMA_EMAIL_ENABLED=false
 ./gradlew bootRun
 ```
 
@@ -57,8 +59,8 @@ The frontend proxies `/api` requests to `http://localhost:8081`.
 - PostgreSQL runtime is now standardized on PostgreSQL 16 + PostGIS for `local`, `test`, and `production`.
 - Backend phase 1 also introduces locale resolution, S3-compatible storage abstractions, and a provider-based geocoding layer.
 - Backend phase 6 introduces OpenAPI at `/swagger-ui.html`, health checks at `/actuator/health`, JaCoCo coverage reports, stricter security headers, JWT audience validation, and a repo-level pre-commit secret scan hook under `.githooks/pre-commit`.
-- `deploy/test/docker-compose.yml` provisions the test stack for Dokploy.
-- `deploy/production/docker-compose.yml` provisions the production stack for AWS EC2.
-- GitHub Actions: `ci.yml` runs backend tests + JaCoCo coverage on PRs; deploy workflows target Dokploy (test) and AWS (production).
+- `deploy/test/docker-compose.yml` provisions the Dokploy test stack with backend + frontend containers that connect to Neon test.
+- Production deploys are handled by Railway for the backend and Vercel for the frontend, both connected to Neon prod.
+- GitHub Actions: `ci.yml` runs backend tests + JaCoCo plus frontend lint/test/build; `deploy-test-dokploy.yml` builds and pushes backend/frontend images for the test environment.
 - Phase 5 adds trilingual email (ES/EN/CA), weekly digests, event reminders, blog, and group discussions. Schedulers default to **off** until enabled via env vars.
 - The implementation plan is tracked in [`.agent/specs/karma-platform/tasks.md`](/Users/zion/dev/project/karma/.agent/specs/karma-platform/tasks.md).

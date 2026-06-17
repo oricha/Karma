@@ -14,19 +14,20 @@ The API starts on `http://localhost:8081`.
 
 ## Profiles
 
-- `local`: connects to PostgreSQL via `docker compose` on `localhost:5433` (or override for a native install on 5432)
-- `test`: containerized PostgreSQL for the Dokploy environment
-- `production`: containerized PostgreSQL for AWS deployment
+- `local`: connects to native PostgreSQL on `localhost:5432`
+- `test`: connects to Neon test via `SPRING_DATASOURCE_URL` and deploys on Dokploy
+- `production`: connects to Neon prod via `SPRING_DATASOURCE_URL` and deploys on Railway
 
 All runtime profiles now target PostgreSQL 16 with PostGIS enabled. Automated backend tests still use H2 and skip Flyway so PostGIS-specific migrations do not break CI.
 
 You can override credentials with environment variables:
 
 ```bash
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/karma_local
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/karma_local
 SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
 KARMA_JWT_SECRET=replace-with-a-long-random-secret
+KARMA_EMAIL_ENABLED=false
 ```
 
 ## Security and observability
@@ -98,33 +99,29 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 ## Container deployment assets
 
 - `Dockerfile`: backend image build
-- `../deploy/test/docker-compose.yml`: Dokploy test stack
-- `../deploy/production/docker-compose.yml`: AWS production stack
+- `../deploy/test/docker-compose.yml`: Dokploy test stack using Neon test
+- Production backend is deployed by Railway from `backend/Dockerfile`
 
-## Production workflow secrets
+## Deployment variables
 
-The AWS workflow expects these GitHub secrets:
+Dokploy test requires these environment variables:
 
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_REGION`
-- `AWS_EC2_HOST`
-- `AWS_EC2_USER`
-- `AWS_EC2_SSH_KEY`
-- `AWS_ECR_REPOSITORY`
-- `PRODUCTION_DB_NAME`
-- `PRODUCTION_DB_USER`
-- `PRODUCTION_DB_PASSWORD`
-- `PRODUCTION_APP_PORT`
-- `PRODUCTION_FRONTEND_ORIGIN`
-- `PRODUCTION_JWT_SECRET`
-- `KARMA_SECURITY_REQUIRE_HTTPS`
+- `BACKEND_IMAGE`
+- `FRONTEND_IMAGE`
+- `SPRING_DATASOURCE_URL` with `?sslmode=require`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+- `KARMA_FRONTEND_ORIGIN`
+- `KARMA_JWT_SECRET`
 
 The Dokploy workflow expects:
 
 ```bash
 DOKPLOY_DEPLOY_HOOK_URL=https://your-dokploy-instance.example.com/api/trpc/deployment.deploy?...
+TEST_VITE_API_URL=https://your-test-backend.example.com
 ```
+
+Railway production requires `SPRING_PROFILES_ACTIVE=production`, Neon prod datasource variables, `KARMA_FRONTEND_ORIGIN`, `KARMA_JWT_SECRET`, `KARMA_SECURITY_REQUIRE_HTTPS=true`, and production provider secrets such as SendGrid/Stripe when enabled. Railway injects `PORT`; `application.yml` maps it automatically.
 
 ## Implemented API surface
 

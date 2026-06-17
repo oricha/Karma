@@ -38,6 +38,18 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/karma-backend:develop
             ghcr.io/${{ github.repository_owner }}/karma-backend:${{ github.sha }}
 
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          build-args: |
+            VITE_API_URL=${{ secrets.TEST_VITE_API_URL }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/karma-frontend:develop
+            ghcr.io/${{ github.repository_owner }}/karma-frontend:${{ github.sha }}
+
       - name: Trigger Dokploy deployment
         env:
           DOKPLOY_DEPLOY_HOOK_URL: ${{ secrets.DOKPLOY_DEPLOY_HOOK_URL }}

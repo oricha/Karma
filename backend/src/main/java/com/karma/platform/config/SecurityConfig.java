@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -25,6 +26,8 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final String frontendOrigin;
+    private final List<String> frontendOrigins;
+    private final String cspFrontendOrigins;
     private final boolean requireHttps;
 
     public SecurityConfig(
@@ -34,6 +37,11 @@ public class SecurityConfig {
     ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.frontendOrigin = frontendOrigin;
+        this.frontendOrigins = Arrays.stream(frontendOrigin.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .toList();
+        this.cspFrontendOrigins = String.join(" ", this.frontendOrigins);
         this.requireHttps = requireHttps;
     }
 
@@ -50,7 +58,7 @@ public class SecurityConfig {
                         .maxAgeInSeconds(31536000)
                 )
                 .contentSecurityPolicy(csp -> csp
-                        .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self' data:; connect-src 'self' " + frontendOrigin + "; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'")
+                        .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self' data:; connect-src 'self' " + cspFrontendOrigins + "; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'")
                 )
                 .frameOptions(frame -> frame.deny())
                 .contentTypeOptions(contentType -> {})
@@ -91,7 +99,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontendOrigin));
+        configuration.setAllowedOrigins(frontendOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(false);
