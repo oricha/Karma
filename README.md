@@ -16,7 +16,7 @@ From the repo root:
 docker compose up -d
 ```
 
-- PostgreSQL: `localhost:5432` (db `karma_local`, user/password `postgres`)
+- PostgreSQL: `localhost:5433` (db `karma_local`, user/password `postgres`; port 5433 avoids conflict with a local Postgres on 5432)
 - MailHog UI: http://localhost:8025 (SMTP on `localhost:1025`)
 
 Use `karma.email.provider=mailhog` in `backend/src/main/resources/application-local.yml` and `KARMA_EMAIL_ENABLED=true` to capture outbound mail locally.
@@ -27,7 +27,7 @@ Use `karma.email.provider=mailhog` in `backend/src/main/resources/application-lo
 
 ```bash
 cd backend
-export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/karma_local
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/karma_local
 export SPRING_DATASOURCE_USERNAME=postgres
 export SPRING_DATASOURCE_PASSWORD=postgres
 export KARMA_JWT_SECRET=replace-with-a-long-random-secret

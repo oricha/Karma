@@ -14,7 +14,7 @@ The API starts on `http://localhost:8081`.
 
 ## Profiles
 
-- `local`: connects to PostgreSQL installed on the machine
+- `local`: connects to PostgreSQL via `docker compose` on `localhost:5433` (or override for a native install on 5432)
 - `test`: containerized PostgreSQL for the Dokploy environment
 - `production`: containerized PostgreSQL for AWS deployment
 
@@ -23,7 +23,7 @@ All runtime profiles now target PostgreSQL 16 with PostGIS enabled. Automated ba
 You can override credentials with environment variables:
 
 ```bash
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/karma_local
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/karma_local
 SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
 KARMA_JWT_SECRET=replace-with-a-long-random-secret
